@@ -8,30 +8,32 @@ export interface IUser {
 }
 
 export interface IUserDocument extends IUser, Document {
-  generateToken: (this: IUserDocument) => Promise<string>;
+  generateToken(this: IUserDocument): Promise<string>;
 }
-export interface IUserModel extends Model<IUserDocument> {}
+export interface IUserModel extends Model<IUserDocument> {
+  findTotal(): Promise<number>;
+}
 
-const userSchema = new Schema<IUserDocument>({
+const userSchema = new Schema<IUserDocument, IUserModel>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
 });
 
-userSchema.methods.generateToken = async function (
+userSchema.methods.generateToken = async function generateToken(
   this: IUserDocument
 ): Promise<string> {
   const tokenData = this.toJSON();
   return jwt.sign(tokenData, process.env.JWT_KEY || 'jsonwebtoken');
 };
 
-userSchema.statics.findCount = async function (
-  this: IUserModel
+userSchema.statics.findTotal = async function findTotal(
+  this: Model<IUserDocument>
 ): Promise<number> {
   const count = await this.count();
   return count;
 };
 
-const User = model<IUserDocument>('User', userSchema);
+const User = model<IUserDocument, IUserModel>('User', userSchema);
 
 export default User;

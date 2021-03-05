@@ -1,4 +1,5 @@
-import User, { IUserDocument } from '@root/database/models/user/user.model';
+import User from '@models/user/user.model';
+import { IUserDocument } from '@models/user/user.types';
 import bcrypt from 'bcrypt';
 
 /**
