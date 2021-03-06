@@ -1,3 +1,5 @@
+// Here lies all the instance methods for user model.
+
 import jwt from 'jsonwebtoken';
 import { IUserDocument } from './user.types';
 

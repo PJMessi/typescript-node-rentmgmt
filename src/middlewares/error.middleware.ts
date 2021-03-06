@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import logger from '@helpers/logging/loggingHelper';
+import logger from '@root/helpers/logging/logging.helper';
 
 export default (
   error: any,

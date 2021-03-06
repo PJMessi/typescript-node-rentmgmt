@@ -16,6 +16,8 @@ export const createUser = async (userAttributes: {
     password: await bcrypt.hash(userAttributes.password, 10),
   });
 
+  console.log(await User.findCount());
+
   const token = await user.generateToken();
 
   return { user, token };

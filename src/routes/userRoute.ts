@@ -2,11 +2,11 @@ import { Router } from 'express';
 import {
   registerUser,
   loginuser,
-} from '@controllers/authentication/authenticationController';
+} from '@root/controllers/authentication/authentication.controller';
 import {
   validateForLoginUser,
   validateForRegisterUser,
-} from '@controllers/authentication/authenticationValidation';
+} from '@root/controllers/authentication/authentication.validation';
 
 const router = Router();
 

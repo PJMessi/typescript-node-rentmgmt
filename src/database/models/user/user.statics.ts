@@ -1,3 +1,5 @@
+// Here lies all the static methods for User model.
+
 import { IUserModel } from './user.types';
 
 // eslint-disable-next-line import/prefer-default-export
