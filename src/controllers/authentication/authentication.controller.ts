@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { createUser, loginUser } from '@root/services/user/user.service';
+import userService from '@root/services/user/user.service';
 import createError from 'http-errors';
 
 /**
@@ -21,7 +21,7 @@ export const registerUser = async (
       name: string;
     } = req.body;
 
-    const { user, token } = await createUser(requestBody);
+    const { user, token } = await userService.createUser(requestBody);
 
     return res.json({
       success: true,
@@ -50,7 +50,7 @@ export const loginuser = async (
       password: string;
     } = req.body;
 
-    const { user, token } = await loginUser(requestBody);
+    const { user, token } = await userService.loginUser(requestBody);
 
     return res.json({
       success: true,

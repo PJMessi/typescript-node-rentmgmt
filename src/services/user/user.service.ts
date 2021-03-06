@@ -60,3 +60,5 @@ export const fetchUserById = async (
 
   return user;
 };
+
+export default { loginUser, createUser, fetchUserById };
