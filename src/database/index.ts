@@ -1,29 +1,21 @@
-import Mongoose from 'mongoose';
-import logger from '@helpers/logging/logging.helper';
+import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 
-let database: Mongoose.Connection;
+const DB_URL = process.env.DB_URL || '';
 
-export const connectDatabase = (): void => {
-  const uri = process.env.DB_URL || '';
-  if (database) return;
-
-  Mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useFindAndModify: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  });
-
-  database = Mongoose.connection;
-  database.once('open', async () => {
-    logger.info(`Connected to Mongo DB.`);
-  });
-  database.on('error', (error) => {
-    logger.info(`Could not connect to Mongo DB.\n${error}`);
-  });
+const sequelizeOptions: SequelizeOptions = {
+  dialectOptions: {
+    charset: 'utf8',
+    multipleStatements: true,
+  },
+  logging: false,
+  models: [`${__dirname}/models`],
+  modelMatch: (filename, member) => {
+    return (
+      filename.substring(0, filename.indexOf('.model')) === member.toLowerCase()
+    );
+  },
 };
 
-export const disconnectDatabase = (): void => {
-  if (!database) return;
-  Mongoose.disconnect();
-};
+const sequelize: Sequelize = new Sequelize(DB_URL, sequelizeOptions);
+
+export default sequelize;

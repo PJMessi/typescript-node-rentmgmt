@@ -2,7 +2,7 @@ import createError from 'http-errors';
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { fetchUserById } from '@services/user/user.service';
-import { JwtEncodedUserData } from '@root/database/models/user/user.types';
+import { JwtEncodedUserData } from '@models/user.model';
 
 const parseBearerToken = (bearerToken: string): string => {
   return bearerToken.substring(7);

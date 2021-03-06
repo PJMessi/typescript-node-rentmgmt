@@ -1,5 +1,4 @@
-import Room from '@models/room/room.model';
-import { IRoomDocument } from '@root/database/models/room/room.types';
+import { Room } from '@models/room.model';
 
 /**
  * Creates new room from the given attributes.
@@ -8,7 +7,7 @@ import { IRoomDocument } from '@root/database/models/room/room.types';
 export const createRoom = async (roomAttributes: {
   name: string;
   description?: string;
-}): Promise<IRoomDocument> => {
+}): Promise<Room> => {
   const room = await Room.create({
     ...roomAttributes,
     status: Room.STATUS.EMPTY,

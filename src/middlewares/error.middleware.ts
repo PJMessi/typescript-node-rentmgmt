@@ -3,8 +3,8 @@ import logger from '@root/helpers/logging/logging.helper';
 
 export default (
   error: any,
-  request: Request,
-  response: Response,
+  req: Request,
+  res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ) => {
@@ -14,19 +14,17 @@ export default (
   if (status === 500) {
     const errorMessage = { success: false, message: error.message };
     logger.error(error);
-    return response.status(500).json(errorMessage);
+    return res.status(500).json(errorMessage);
   }
 
   // for validation error, includes the error fields.
   if (status === 422) {
-    return response.status(status).json({
+    return res.status(status).json({
       success: false,
       message: 'The given data was invalid.',
       errors: error.message,
     });
   }
 
-  return response
-    .status(status)
-    .json({ success: false, message: error.message });
+  return res.status(status).json({ success: false, message: error.message });
 };
