@@ -1,6 +1,8 @@
 /**
  * Define all the instance methods for the user mode here.
- * After defining the method here, make sure to update the IUserDocument interface in user.types.ts.
+ * After defining the method here:
+ *  1. make sure to declare the method in IUserDocument interface in user.types.ts.
+ *  2. make sure to assign the method in userSchema in user.schema.ts
  */
 
 import jwt from 'jsonwebtoken';

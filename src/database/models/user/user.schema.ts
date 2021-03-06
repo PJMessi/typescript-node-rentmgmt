@@ -23,7 +23,14 @@ const userSchema = new Schema<IUserDocument, IUserModel>({
   },
 });
 
-userSchema.methods.generateToken = generateToken;
-userSchema.statics.findCount = findCount;
+// Assign the instance methods defined in user.methods.ts here.
+userSchema.methods = {
+  generateToken,
+};
+
+// Assign the static methods defined in user.statics.ts here.
+userSchema.statics = {
+  findCount,
+};
 
 export default userSchema;
