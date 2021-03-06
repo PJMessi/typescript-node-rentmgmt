@@ -9,7 +9,10 @@ export const createRoom = async (roomAttributes: {
   name: string;
   description?: string;
 }): Promise<IRoomDocument> => {
-  const room = await Room.create({ ...roomAttributes, status: 'EMPTY' });
+  const room = await Room.create({
+    ...roomAttributes,
+    status: Room.STATUS.EMPTY,
+  });
   return room;
 };
 
