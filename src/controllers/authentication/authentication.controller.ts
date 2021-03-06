@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { createUser } from '@services/user/userService';
+import { createUser, loginUser } from '@root/services/user/user.service';
+import createError from 'http-errors';
 
 /**
  * POST /auth/register
@@ -44,8 +45,43 @@ export const loginuser = async (
   next: NextFunction
 ): Promise<void | Response> => {
   try {
+    const requestBody: {
+      email: string;
+      password: string;
+    } = req.body;
+
+    const { user, token } = await loginUser(requestBody);
+
     return res.json({
       success: true,
+      data: { user, token },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * GET /auth/profile
+ * Fetches the data of the user of the bearer token.
+ * @param req
+ * @param res
+ * @param next
+ */
+export const fetchProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  try {
+    const { user } = req.auth;
+    if (!user) {
+      throw new createError.Unauthorized();
+    }
+
+    return res.json({
+      success: true,
+      data: { user },
     });
   } catch (error) {
     return next(error);

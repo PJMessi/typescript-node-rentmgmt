@@ -5,6 +5,15 @@ import logger from '@root/helpers/logging/logging.helper';
 import dotenv from 'dotenv';
 import routes from './routes/route';
 import { connectDatabase } from './database/index';
+import { IUserDocument } from './database/models/user/user.types';
+
+declare global {
+  namespace Express {
+    interface Request {
+      auth: { user?: IUserDocument };
+    }
+  }
+}
 
 dotenv.config();
 
