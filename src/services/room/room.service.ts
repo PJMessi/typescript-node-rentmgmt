@@ -16,4 +16,12 @@ export const createRoom = async (roomAttributes: {
   return room;
 };
 
-export default { createRoom };
+/**
+ * Fetches all the rooms.
+ */
+export const fetchAllRooms = async (): Promise<Room[]> => {
+  const rooms = await Room.findAll();
+  return rooms;
+};
+
+export default { createRoom, fetchAllRooms };

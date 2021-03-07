@@ -31,3 +31,26 @@ export const createRoom = async (
     return next(error);
   }
 };
+
+/**
+ * GET /rooms
+ * Fetches all the rooms.
+ * @param req
+ * @param res
+ * @param next
+ */
+export const fetchAllRooms = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  try {
+    const rooms = await roomService.fetchAllRooms();
+    return res.json({
+      status: true,
+      data: { rooms },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
