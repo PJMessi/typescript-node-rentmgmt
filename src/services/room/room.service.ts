@@ -7,6 +7,7 @@ import { Room } from '@models/room.model';
 export const createRoom = async (roomAttributes: {
   name: string;
   description?: string;
+  price: number;
 }): Promise<Room> => {
   const room = await Room.create({
     ...roomAttributes,

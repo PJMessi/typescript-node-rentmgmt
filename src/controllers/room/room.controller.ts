@@ -18,6 +18,7 @@ export const createRoom = async (
     const reqBody: {
       name: string;
       description?: string;
+      price: number;
     } = req.body;
 
     const room = await roomService.createRoom(reqBody);

@@ -22,6 +22,11 @@ module.exports.up = async (queryInterface, DataTypes) => {
       type: DataTypes.STRING,
     },
 
+    price: {
+      allowNull: true,
+      type: DataTypes.DECIMAL(8, 2),
+    },
+
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

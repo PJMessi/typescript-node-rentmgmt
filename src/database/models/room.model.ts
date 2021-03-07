@@ -12,8 +12,9 @@ import {
 export interface RoomAttributes {
   id: number;
   name: string;
-  status: 'OCCUPIED' | 'EMPTY';
   description: string;
+  status: 'OCCUPIED' | 'EMPTY';
+  price: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -45,6 +46,12 @@ export class Room extends Model<RoomAttributes, RoomCreationAttributes> {
   })
   status!: 'OCCUPIED' | 'EMPTY';
 
+  @Column({
+    type: DataType.DECIMAL(8, 2),
+    allowNull: false,
+  })
+  price!: number;
+
   @CreatedAt
   createdAt!: Date;
 
@@ -63,6 +70,7 @@ export class Room extends Model<RoomAttributes, RoomCreationAttributes> {
       name: this.name,
       description: this.description,
       status: this.status,
+      price: this.price,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };

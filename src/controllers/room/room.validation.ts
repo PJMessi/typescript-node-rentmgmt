@@ -19,11 +19,11 @@ export const validateForCreateRoom = async (
     const validationSchema = Joi.object({
       name: Joi.string().required().max(255),
       description: Joi.string().max(255),
+      price: Joi.number().required().min(1).max(999999.99),
     }).options({ abortEarly: false });
 
     const requestBody: {
       name?: string;
-      string?: string;
       description?: string;
     } = request.body;
 
