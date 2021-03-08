@@ -3,14 +3,14 @@ import Joi from 'joi';
 import createError from 'http-errors';
 
 /**
- * POST /rooms
+ * POST /families
  * Validates data for above API.
  * @param request
  * @param response
  * @param next
  */
 // eslint-disable-next-line import/prefer-default-export
-export const validateForCreateRoom = async (
+export const validateForCreateFamily = async (
   request: Request,
   response: Response,
   next: NextFunction
@@ -18,13 +18,28 @@ export const validateForCreateRoom = async (
   try {
     const validationSchema = Joi.object({
       name: Joi.string().required().max(255),
-      description: Joi.string().max(255),
-      price: Joi.number().required().min(1).max(999999.99),
+      status: Joi.string().required().valid('LEFT', 'ACTIVE'),
+      sourceOfIncome: Joi.string().required().max(255),
+      membersList: Joi.array()
+        .required()
+        .items({
+          name: Joi.string().required().max(255),
+          email: Joi.string().email(),
+          mobile: Joi.string().max(20),
+          birthDay: Joi.date().required(),
+        }),
     }).options({ abortEarly: false });
 
     const requestBody: {
       name?: string;
-      description?: string;
+      status: 'LEFT' | 'ACTIVE';
+      sourceOfIncome: string;
+      membersList: {
+        name: string;
+        email?: string;
+        mobile?: string;
+        birthDay: Date;
+      }[];
     } = request.body;
 
     await validationSchema
