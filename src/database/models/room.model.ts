@@ -7,7 +7,12 @@ import {
   CreatedAt,
   UpdatedAt,
   DeletedAt,
+  BelongsToMany,
 } from 'sequelize-typescript';
+// eslint-disable-next-line import/no-cycle
+import { Family } from './family.model';
+// eslint-disable-next-line import/no-cycle
+import { RoomFamilyHistory } from './roomfamilyhistory.model';
 
 export interface RoomAttributes {
   id: number;
@@ -60,6 +65,9 @@ export class Room extends Model<RoomAttributes, RoomCreationAttributes> {
 
   @DeletedAt
   deletedAt!: Date;
+
+  @BelongsToMany(() => Family, () => RoomFamilyHistory)
+  families!: Array<Family & { RoomFamilyHistory: RoomFamilyHistory }>;
 
   /**
    * Overriding default toJSON method to exculde deletedAt attributes while sending room as a response.

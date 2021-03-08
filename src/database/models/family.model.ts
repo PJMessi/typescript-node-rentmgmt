@@ -8,9 +8,14 @@ import {
   UpdatedAt,
   DeletedAt,
   HasMany,
+  BelongsToMany,
 } from 'sequelize-typescript';
 // eslint-disable-next-line import/no-cycle
 import { Member, MemberCreationAttributes } from './member.model';
+// eslint-disable-next-line import/no-cycle
+import { Room } from './room.model';
+// eslint-disable-next-line import/no-cycle
+import { RoomFamilyHistory } from './roomfamilyhistory.model';
 
 export interface FamilyAttributes {
   id: number;
@@ -20,14 +25,26 @@ export interface FamilyAttributes {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
-  members: Omit<MemberCreationAttributes, 'familyId'>[];
+  members: Member[];
 }
 
+/**
+ * For FamilyCreationAttributes, we are not just using 'Optional' utility to make attributes in FamilyAttributes
+ * optional.
+ * This is because, in FamilyAttributes, there is 'members: Member[]' property. But while creating, we
+ * want to receive 'members?: Omit<MemberCreationAttributes, 'familyId'>[]'. Simply making it optional is not
+ * enough. And its not possible to update the interface property.
+ * So, we are omitting the 'members' from FamilyAttributes using 'Omit' utility, and then we are using
+ * 'Optional' utility to make other attributes optional.
+ * Then we are re-defining the 'members'.
+ */
 export interface FamilyCreationAttributes
   extends Optional<
-    FamilyAttributes,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'members'
-  > {}
+    Omit<FamilyAttributes, 'members'>,
+    'id' | 'updatedAt' | 'createdAt' | 'deletedAt'
+  > {
+  members?: Omit<MemberCreationAttributes, 'familyId'>[];
+}
 
 @Table({ tableName: 'families' })
 export class Family extends Model<FamilyAttributes, FamilyCreationAttributes> {
@@ -60,6 +77,9 @@ export class Family extends Model<FamilyAttributes, FamilyCreationAttributes> {
 
   @HasMany(() => Member, 'familyId')
   members!: Member[];
+
+  @BelongsToMany(() => Room, () => RoomFamilyHistory)
+  rooms!: Array<Room & { RoomFamilyHistory: RoomFamilyHistory }>;
 
   /**
    * Overriding default toJSON method to exculde deletedAt attributes while sending family as a response.

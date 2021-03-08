@@ -24,6 +24,8 @@ export const createFamily = async (familyAttributes: CreateFamilyParameter) => {
     { include: 'members' }
   );
 
+  console.log(family.rooms);
+
   return family;
 };
 
