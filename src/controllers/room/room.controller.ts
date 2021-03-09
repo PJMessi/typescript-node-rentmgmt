@@ -8,7 +8,6 @@ import roomService from '@services/room/room.service';
  * @param res
  * @param next
  */
-// eslint-disable-next-line import/prefer-default-export
 export const createRoom = async (
   req: Request,
   res: Response,
@@ -34,7 +33,7 @@ export const createRoom = async (
 
 /**
  * GET /rooms
- * Fetches all the rooms.
+ * Fetches all the rooms with the current family if any.
  * @param req
  * @param res
  * @param next

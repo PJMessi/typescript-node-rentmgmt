@@ -17,10 +17,10 @@ export const createRoom = async (roomAttributes: {
 };
 
 /**
- * Fetches all the rooms.
+ * Fetches all the rooms with the current family if any.
  */
 export const fetchAllRooms = async (): Promise<Room[]> => {
-  const rooms = await Room.findAll();
+  const rooms = await Room.findAll({ include: 'families' });
   return rooms;
 };
 

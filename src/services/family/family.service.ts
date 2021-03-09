@@ -1,3 +1,4 @@
+import sequelize from '@root/database';
 import { Family } from '@root/database/models/family.model';
 import { Room } from '@root/database/models/room.model';
 import createError from 'http-errors';
@@ -16,11 +17,12 @@ type CreateFamilyParameter = {
 };
 
 /**
- * Creates new family and members.
+ * Creates new family along with the family members.
  * @param familyAttributes
  */
 export const createFamily = async (familyAttributes: CreateFamilyParameter) => {
   const { name, status, sourceOfIncome, membersList } = familyAttributes;
+
   const family = await Family.create(
     { name, status, sourceOfIncome, members: membersList },
     { include: 'members' }
@@ -30,7 +32,7 @@ export const createFamily = async (familyAttributes: CreateFamilyParameter) => {
 };
 
 /**
- * Assigns room to the family.
+ * Assigns room to a new family OR update the room for an existing family.
  * @param familyId
  * @param roomId
  */
@@ -43,10 +45,6 @@ export const assignRoom = async (
     throw new createError.NotFound('Family with the given id does not exist.');
   }
 
-  if (family.rooms.length > 0) {
-    throw new createError.BadRequest('Family already assigned to a room.');
-  }
-
   const room = await Room.findByPk(roomId, { include: 'families' });
   if (room === null) {
     throw new createError.NotFound('Room with the given id does not exist.');
@@ -56,7 +54,39 @@ export const assignRoom = async (
     throw new createError.BadRequest('Room already occupied.');
   }
 
-  await family.$add('rooms', room);
+  const transaction = await sequelize.transaction();
+  try {
+    if (family.rooms.length > 0) {
+      const oldRoom = family.rooms[0];
+      oldRoom.update({ status: Room.STATUS.EMPTY });
+      await family.$remove('rooms', family.rooms[0], { transaction });
+    }
+
+    await family.$add('rooms', room, { transaction });
+    room.update({ status: Room.STATUS.OCCUPIED });
+
+    transaction.commit();
+  } catch (error) {
+    transaction.rollback();
+    throw error;
+  }
 };
 
-export default { createFamily, assignRoom };
+/**
+ * Fetches the Room with given id along with the information about the room they
+ * are using and the family members.
+ * @param familyId
+ */
+export const fetchFamily = async (familyId: number): Promise<void | Family> => {
+  const family = await Family.findByPk(familyId, {
+    include: ['members', 'rooms'],
+  });
+
+  if (family === null) {
+    throw new createError.NotFound('Room with the given id does not exist.');
+  }
+
+  return family;
+};
+
+export default { createFamily, assignRoom, fetchFamily };

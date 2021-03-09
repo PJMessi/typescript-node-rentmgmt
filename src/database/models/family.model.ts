@@ -26,6 +26,7 @@ export interface FamilyAttributes {
   updatedAt: Date;
   deletedAt: Date;
   members: Member[];
+  rooms: Room[];
 }
 
 /**
@@ -41,7 +42,7 @@ export interface FamilyAttributes {
 export interface FamilyCreationAttributes
   extends Optional<
     Omit<FamilyAttributes, 'members'>,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt'
+    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'rooms'
   > {
   members?: Omit<MemberCreationAttributes, 'familyId'>[];
 }
@@ -93,6 +94,7 @@ export class Family extends Model<FamilyAttributes, FamilyCreationAttributes> {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       members: this.members,
+      rooms: this.rooms,
     };
   };
 
