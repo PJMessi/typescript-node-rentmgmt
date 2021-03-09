@@ -79,7 +79,7 @@ export class Family extends Model<FamilyAttributes, FamilyCreationAttributes> {
   members!: Member[];
 
   @BelongsToMany(() => Room, () => RoomFamilyHistory)
-  rooms!: Array<Room & { RoomFamilyHistory: RoomFamilyHistory }>;
+  rooms!: Room[];
 
   /**
    * Overriding default toJSON method to exculde deletedAt attributes while sending family as a response.

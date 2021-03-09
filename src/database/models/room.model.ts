@@ -23,12 +23,13 @@ export interface RoomAttributes {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
+  families: Family[];
 }
 
 export interface RoomCreationAttributes
   extends Optional<
     RoomAttributes,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'description'
+    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'description' | 'families'
   > {}
 
 @Table({ tableName: 'rooms' })
@@ -67,7 +68,7 @@ export class Room extends Model<RoomAttributes, RoomCreationAttributes> {
   deletedAt!: Date;
 
   @BelongsToMany(() => Family, () => RoomFamilyHistory)
-  families!: Array<Family & { RoomFamilyHistory: RoomFamilyHistory }>;
+  families!: Family[];
 
   /**
    * Overriding default toJSON method to exculde deletedAt attributes while sending room as a response.
@@ -81,6 +82,7 @@ export class Room extends Model<RoomAttributes, RoomCreationAttributes> {
       price: this.price,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
+      families: this.families,
     };
   };
 
