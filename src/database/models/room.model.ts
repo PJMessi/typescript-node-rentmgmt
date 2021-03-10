@@ -1,18 +1,20 @@
-import { Optional } from 'sequelize';
 import {
-  Table,
   Model,
-  Column,
-  DataType,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt,
-  BelongsToMany,
-} from 'sequelize-typescript';
+  DataTypes,
+  Optional,
+  HasManyRemoveAssociationMixin,
+  HasManyCountAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  HasManySetAssociationsMixin,
+  HasManyAddAssociationsMixin,
+  HasManyAddAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+} from 'sequelize';
+import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
-import { Family } from './family.model';
-// eslint-disable-next-line import/no-cycle
-import { RoomFamilyHistory } from './roomfamilyhistory.model';
+import Family from './family.model';
 
 export interface RoomAttributes {
   id: number;
@@ -23,78 +25,99 @@ export interface RoomAttributes {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
-  families: Family[];
 }
 
 export interface RoomCreationAttributes
   extends Optional<
     RoomAttributes,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'description' | 'families'
+    'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'description'
   > {}
 
-@Table({ tableName: 'rooms' })
-export class Room extends Model<RoomAttributes, RoomCreationAttributes> {
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  name!: string;
+class Room
+  extends Model<RoomAttributes, RoomCreationAttributes>
+  implements RoomAttributes {
+  public id!: number;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  description!: string;
+  public name!: string;
 
-  @Column({
-    type: DataType.ENUM('OCCUPIED', 'EMPTY'),
-    allowNull: true,
-  })
-  status!: 'OCCUPIED' | 'EMPTY';
+  public description!: string;
 
-  @Column({
-    type: DataType.DECIMAL(8, 2),
-    allowNull: false,
-  })
-  price!: number;
+  public status!: 'OCCUPIED' | 'EMPTY';
 
-  @CreatedAt
-  createdAt!: Date;
+  public price!: number;
 
-  @UpdatedAt
-  updatedAt!: Date;
+  public createdAt!: Date;
 
-  @DeletedAt
-  deletedAt!: Date;
+  public updatedAt!: Date;
 
-  @BelongsToMany(() => Family, () => RoomFamilyHistory)
-  families!: Family[];
+  public deletedAt!: Date;
 
-  /**
-   * Overriding default toJSON method to exculde deletedAt attributes while sending room as a response.
-   */
-  toJSON = (): Omit<RoomAttributes, 'deletedAt'> => {
-    return {
-      id: this.id,
-      name: this.name,
-      description: this.description,
-      status: this.status,
-      price: this.price,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      families: this.families,
-    };
-  };
+  public readonly families?: Family[];
 
-  // Declare the static variable for this class here.
-  static STATUS: {
-    EMPTY: 'EMPTY';
-    OCCUPIED: 'OCCUPIED';
-  };
+  public getFamilies!: HasManyGetAssociationsMixin<Family>;
+
+  public setFamilies!: HasManySetAssociationsMixin<Family, number>;
+
+  public addFamilies!: HasManyAddAssociationsMixin<Family, number>;
+
+  public addFamily!: HasManyAddAssociationMixin<Family, number>;
+
+  // Does not provide type support. So better not use it.
+  // public createFamily!: HasManyCreateAssociationMixin<Family>;
+
+  public removeFamily!: HasManyRemoveAssociationMixin<Family, number>;
+
+  public removeFamilies!: HasManyRemoveAssociationsMixin<Family, number>;
+
+  public hasFamily!: HasManyHasAssociationMixin<Family, number>;
+
+  public hasFamilies!: HasManyHasAssociationsMixin<Family, number>;
+
+  public countFamilies!: HasManyCountAssociationsMixin;
 }
 
-// Initialize the static variable declared in the class here.
-Room.STATUS = {
-  EMPTY: 'EMPTY',
-  OCCUPIED: 'OCCUPIED',
-};
+Room.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM('OCCUPIED', 'EMPTY'),
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.DECIMAL(8, 2),
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: 'rooms',
+    modelName: 'Room',
+    sequelize: sequelizeInstance,
+    paranoid: true,
+  }
+);
+
+export default Room;

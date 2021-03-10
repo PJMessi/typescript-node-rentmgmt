@@ -1,14 +1,6 @@
-import { Optional } from 'sequelize';
-import {
-  Table,
-  Model,
-  Column,
-  DataType,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt,
-} from 'sequelize-typescript';
+import { Model, DataTypes, Optional } from 'sequelize';
 import jwt from 'jsonwebtoken';
+import sequelizeInstance from '../connection';
 
 export interface UserAttributes {
   id: number;
@@ -25,43 +17,27 @@ export type JwtEncodedUserData = Omit<UserAttributes, 'password' | 'deletedAt'>;
 export interface UserCreationAttributes
   extends Optional<
     UserAttributes,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt'
+    'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
   > {}
 
-@Table({ tableName: 'users' })
-export class User extends Model<UserAttributes, UserCreationAttributes> {
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  name!: string;
+class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes {
+  public id!: number;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    unique: true,
-  })
-  email!: string;
+  public name!: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  password!: string;
+  public email!: string;
 
-  @CreatedAt
-  createdAt!: Date;
+  public password!: string;
 
-  @UpdatedAt
-  updatedAt!: Date;
+  public createdAt!: Date;
 
-  @DeletedAt
-  deletedAt!: Date;
+  public updatedAt!: Date;
 
-  /**
-   * Generates json web token for the user.
-   */
-  generateToken = (): string => {
+  public deletedAt!: Date;
+
+  public generateToken = (): string => {
     const secret = process.env.JWT_SECRET || 'jsonwebtoken';
     const dataToEncode: JwtEncodedUserData = {
       id: this.id,
@@ -73,22 +49,47 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
     const token = jwt.sign(dataToEncode, secret);
     return token;
   };
-
-  /**
-   * Overriding default toJSON method to exculde password and deletedAt attributes while sending
-   * user as a response.
-   */
-  toJSON = (): Omit<UserAttributes, 'password' | 'deletedAt'> => {
-    return {
-      id: this.id,
-      name: this.name,
-      email: this.email,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-    };
-  };
-
-  // Declare the static variable for this class here.
 }
 
-// Initialize the static variable declared in the class here.
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: 'users',
+    modelName: 'User',
+    sequelize: sequelizeInstance,
+    paranoid: true,
+  }
+);
+
+export default User;

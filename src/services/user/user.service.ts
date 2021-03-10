@@ -1,4 +1,5 @@
-import { User } from '@models/user.model';
+import db from '@models/index';
+import User from '@root/database/models/user.model';
 import bcrypt from 'bcrypt';
 import createError from 'http-errors';
 
@@ -10,7 +11,7 @@ export const loginUser = async (credentials: {
   email: string;
   password: string;
 }): Promise<{ user: User; token: string }> => {
-  const user = await User.findOne({ where: { email: credentials.email } });
+  const user = await db.User.findOne({ where: { email: credentials.email } });
   if (!user) throw new createError.Unauthorized('Invalid credentials.');
 
   const passwordMatches = await bcrypt.compare(
@@ -33,14 +34,14 @@ export const createUser = async (userAttributes: {
   name: string;
   password: string;
 }): Promise<{ user: User; token: string }> => {
-  const doesUserExist = await User.findOne({
+  const doesUserExist = await db.User.findOne({
     where: { email: userAttributes.email },
   });
   if (doesUserExist) {
     throw new createError.BadRequest('User with the email already exist.');
   }
 
-  const user = await User.create({
+  const user = await db.User.create({
     ...userAttributes,
     password: await bcrypt.hash(userAttributes.password, 10),
   });
@@ -55,7 +56,7 @@ export const createUser = async (userAttributes: {
  * @param id
  */
 export const fetchUserById = async (id: number): Promise<User | null> => {
-  const user = await User.findByPk(id);
+  const user = await db.User.findByPk(id);
 
   return user;
 };

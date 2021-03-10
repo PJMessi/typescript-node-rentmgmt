@@ -1,25 +1,15 @@
-import { Optional } from 'sequelize';
-import {
-  Table,
-  Model,
-  Column,
-  DataType,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt,
-  ForeignKey,
-  BelongsTo,
-} from 'sequelize-typescript';
+import { Model, DataTypes, Optional } from 'sequelize';
+import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
-import { Family } from './family.model';
+import Family from './family.model';
 
 export interface MemberAttributes {
   id: number;
   familyId: number;
   name: string;
   email: string;
-  mobile: string;
   birthDay: Date;
+  mobile: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -28,71 +18,79 @@ export interface MemberAttributes {
 export interface MemberCreationAttributes
   extends Optional<
     MemberAttributes,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'email' | 'mobile'
+    'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'mobile' | 'email'
   > {}
 
-@Table({ tableName: 'members' })
-export class Member extends Model<MemberAttributes, MemberCreationAttributes> {
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  name!: string;
+class Member
+  extends Model<MemberAttributes, MemberCreationAttributes>
+  implements MemberAttributes {
+  public id!: number;
 
-  @ForeignKey(() => Family)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  familyId!: number;
+  public familyId!: number;
 
-  @BelongsTo(() => Family, 'familyId')
-  family!: Family;
+  public name!: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  email!: string;
+  public email!: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  mobile!: string;
+  public birthDay!: Date;
 
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
-  birthDay!: Date;
+  public mobile!: string;
 
-  @CreatedAt
-  createdAt!: Date;
+  public createdAt!: Date;
 
-  @UpdatedAt
-  updatedAt!: Date;
+  public updatedAt!: Date;
 
-  @DeletedAt
-  deletedAt!: Date;
+  public deletedAt!: Date;
 
-  /**
-   * Overriding default toJSON method to exculde deletedAt attributes while sending member as a response.
-   */
-  toJSON = (): Omit<MemberAttributes, 'deletedAt'> => {
-    return {
-      id: this.id,
-      familyId: this.familyId,
-      name: this.name,
-      email: this.email,
-      mobile: this.mobile,
-      birthDay: this.birthDay,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-    };
-  };
-
-  // Declare the static variable for this class here.
+  public readonly family?: Family;
 }
 
-// Initialize the static variable declared in the class here.
+Member.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    familyId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    birthDay: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    mobile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: 'members',
+    modelName: 'Member',
+    sequelize: sequelizeInstance,
+    paranoid: true,
+  }
+);
+
+export default Member;

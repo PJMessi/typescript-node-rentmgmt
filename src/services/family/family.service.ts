@@ -1,7 +1,8 @@
-import sequelize from '@root/database';
-import { Family } from '@root/database/models/family.model';
-import { Room } from '@root/database/models/room.model';
+import db from '@models/index';
+import Family from '@root/database/models/family.model';
+import Room from '@root/database/models/room.model';
 import createError from 'http-errors';
+import sequelizeInstance from '../../database/connection';
 
 // parameter for createFamily function.
 type CreateFamilyParameter = {
@@ -23,7 +24,7 @@ type CreateFamilyParameter = {
 export const createFamily = async (familyAttributes: CreateFamilyParameter) => {
   const { name, status, sourceOfIncome, membersList } = familyAttributes;
 
-  const family = await Family.create(
+  const family = await db.Family.create(
     { name, status, sourceOfIncome, members: membersList },
     { include: 'members' }
   );
@@ -40,30 +41,40 @@ export const assignRoom = async (
   familyId: number,
   roomId: number
 ): Promise<void> => {
-  const family = await Family.findByPk(familyId, { include: 'rooms' });
+  const family = await db.Family.findByPk(familyId, {
+    include: {
+      association: 'rooms',
+      required: false,
+    },
+  });
   if (family === null) {
-    throw new createError.NotFound('Family with the given id does not exist.');
+    throw new createError.NotFound('Family not found.');
   }
 
-  const room = await Room.findByPk(roomId, { include: 'families' });
+  const room = await db.Room.findByPk(roomId);
   if (room === null) {
-    throw new createError.NotFound('Room with the given id does not exist.');
+    throw new createError.NotFound('Room not found.');
   }
 
-  if (room.families.length > 0) {
+  if (room.status === 'OCCUPIED') {
     throw new createError.BadRequest('Room already occupied.');
   }
 
-  const transaction = await sequelize.transaction();
+  const transaction = await sequelizeInstance.transaction();
   try {
-    if (family.rooms.length > 0) {
-      const oldRoom = family.rooms[0];
-      oldRoom.update({ status: Room.STATUS.EMPTY });
-      await family.$remove('rooms', family.rooms[0], { transaction });
+    if (family.rooms && family.rooms.length > 0) {
+      const oldRoom: Room = family.rooms[0];
+
+      oldRoom.status = 'EMPTY';
+      await oldRoom.save({ transaction });
+
+      await oldRoom.removeFamily(family, { transaction });
     }
 
-    await family.$add('rooms', room, { transaction });
-    room.update({ status: Room.STATUS.OCCUPIED });
+    await room.addFamily(family, { transaction });
+
+    room.status = 'OCCUPIED';
+    await room.save({ transaction });
 
     transaction.commit();
   } catch (error) {
@@ -78,7 +89,7 @@ export const assignRoom = async (
  * @param familyId
  */
 export const fetchFamily = async (familyId: number): Promise<void | Family> => {
-  const family = await Family.findByPk(familyId, {
+  const family = await db.Family.findByPk(familyId, {
     include: ['members', 'rooms'],
   });
 

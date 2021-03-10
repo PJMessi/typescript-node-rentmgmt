@@ -1,21 +1,22 @@
-import { Optional } from 'sequelize';
 import {
-  Table,
   Model,
-  Column,
-  DataType,
-  CreatedAt,
-  UpdatedAt,
-  DeletedAt,
-  HasMany,
-  BelongsToMany,
-} from 'sequelize-typescript';
+  DataTypes,
+  Optional,
+  HasManyGetAssociationsMixin,
+  HasManySetAssociationsMixin,
+  HasManyAddAssociationsMixin,
+  HasManyAddAssociationMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyCountAssociationsMixin,
+} from 'sequelize';
+import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
-import { Member, MemberCreationAttributes } from './member.model';
+import Member, { MemberCreationAttributes } from './member.model';
 // eslint-disable-next-line import/no-cycle
-import { Room } from './room.model';
-// eslint-disable-next-line import/no-cycle
-import { RoomFamilyHistory } from './roomfamilyhistory.model';
+import Room from './room.model';
 
 export interface FamilyAttributes {
   id: number;
@@ -25,88 +26,97 @@ export interface FamilyAttributes {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
-  members: Member[];
-  rooms: Room[];
 }
 
-/**
- * For FamilyCreationAttributes, we are not just using 'Optional' utility to make attributes in FamilyAttributes
- * optional.
- * This is because, in FamilyAttributes, there is 'members: Member[]' property. But while creating, we
- * want to receive 'members?: Omit<MemberCreationAttributes, 'familyId'>[]'. Simply making it optional is not
- * enough. And its not possible to update the interface property.
- * So, we are omitting the 'members' from FamilyAttributes using 'Omit' utility, and then we are using
- * 'Optional' utility to make other attributes optional.
- * Then we are re-defining the 'members'.
- */
 export interface FamilyCreationAttributes
   extends Optional<
-    Omit<FamilyAttributes, 'members'>,
-    'id' | 'updatedAt' | 'createdAt' | 'deletedAt' | 'rooms'
+    FamilyAttributes,
+    'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
   > {
   members?: Omit<MemberCreationAttributes, 'familyId'>[];
 }
 
-@Table({ tableName: 'families' })
-export class Family extends Model<FamilyAttributes, FamilyCreationAttributes> {
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  name!: string;
+class Family
+  extends Model<FamilyAttributes, FamilyCreationAttributes>
+  implements FamilyAttributes {
+  public id!: number;
 
-  @Column({
-    type: DataType.ENUM('ACTIVE', 'LEFT'),
-    allowNull: false,
-  })
-  status!: 'ACTIVE' | 'LEFT';
+  public name!: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  sourceOfIncome!: string;
+  public status!: 'ACTIVE' | 'LEFT';
 
-  @CreatedAt
-  createdAt!: Date;
+  public sourceOfIncome!: string;
 
-  @UpdatedAt
-  updatedAt!: Date;
+  public createdAt!: Date;
 
-  @DeletedAt
-  deletedAt!: Date;
+  public updatedAt!: Date;
 
-  @HasMany(() => Member, 'familyId')
-  members!: Member[];
+  public deletedAt!: Date;
 
-  @BelongsToMany(() => Room, () => RoomFamilyHistory)
-  rooms!: Room[];
+  public readonly members?: Member[];
 
-  /**
-   * Overriding default toJSON method to exculde deletedAt attributes while sending family as a response.
-   */
-  toJSON = (): Omit<FamilyAttributes, 'deletedAt'> => {
-    return {
-      id: this.id,
-      name: this.name,
-      status: this.status,
-      sourceOfIncome: this.sourceOfIncome,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      members: this.members,
-      rooms: this.rooms,
-    };
-  };
+  public readonly rooms?: Room[];
 
-  // Declare the static variable for this class here.
-  static STATUS: {
-    ACTIVE: 'ACTIVE';
-    LEFT: 'LEFT';
-  };
+  public getRooms!: HasManyGetAssociationsMixin<Room>;
+
+  public setRooms!: HasManySetAssociationsMixin<Room, number>;
+
+  public addRooms!: HasManyAddAssociationsMixin<Room, number>;
+
+  public addRoom!: HasManyAddAssociationMixin<Room, number>;
+
+  // Does not provide type support. So better not use it.
+  // public createRoom!: HasManyCreateAssociationMixin<Room>;
+
+  public removeRoom!: HasManyRemoveAssociationMixin<Room, number>;
+
+  public removeRooms!: HasManyRemoveAssociationsMixin<Room, number>;
+
+  public hasRoom!: HasManyHasAssociationMixin<Room, number>;
+
+  public hasRooms!: HasManyHasAssociationsMixin<Room, number>;
+
+  public countRooms!: HasManyCountAssociationsMixin;
 }
 
-// Initialize the static variable declared in the class here.
-Family.STATUS = {
-  ACTIVE: 'ACTIVE',
-  LEFT: 'LEFT',
-};
+Family.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM('ACTIVE', 'LEFT'),
+      allowNull: false,
+    },
+    sourceOfIncome: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: 'families',
+    modelName: 'Family',
+    sequelize: sequelizeInstance,
+    paranoid: true,
+  }
+);
+
+export default Family;

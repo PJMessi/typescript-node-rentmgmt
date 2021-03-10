@@ -1,34 +1,55 @@
-import {
-  Table,
-  Model,
-  Column,
-  ForeignKey,
-  DeletedAt,
-  UpdatedAt,
-  CreatedAt,
-} from 'sequelize-typescript';
-// eslint-disable-next-line import/no-cycle
-import { Family } from './family.model';
-// eslint-disable-next-line import/no-cycle
-import { Room } from './room.model';
+import { Model, DataTypes } from 'sequelize';
+import sequelizeInstance from '../connection';
 
-@Table({ tableName: 'roomFamilyHistories' })
-// eslint-disable-next-line import/prefer-default-export
-export class RoomFamilyHistory extends Model {
-  @ForeignKey(() => Room)
-  @Column
-  roomId!: number;
+class RoomFamilyHistory extends Model {
+  public id!: number;
 
-  @ForeignKey(() => Family)
-  @Column
-  familyId!: number;
+  public roomId!: number;
 
-  @CreatedAt
-  createdAt!: Date;
+  public familyId!: number;
 
-  @UpdatedAt
-  updatedAt!: Date;
+  public createdAt!: Date;
 
-  @DeletedAt
-  deletedAt!: Date;
+  public updatedAt!: Date;
+
+  public deletedAt!: Date;
 }
+
+RoomFamilyHistory.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    roomId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+    },
+    familyId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: 'roomfamilyhistories',
+    modelName: 'RoomFamilyHistory',
+    sequelize: sequelizeInstance,
+    paranoid: true,
+    timestamps: true,
+  }
+);
+
+export default RoomFamilyHistory;
