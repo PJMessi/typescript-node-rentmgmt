@@ -53,3 +53,29 @@ export const fetchAllRooms = async (
     return next(error);
   }
 };
+
+/**
+ * GET /rooms/:roomId
+ * Fetches the room with the given id along with the room history.
+ * @param req
+ * @param res
+ * @param next
+ */
+export const fetchRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  try {
+    const { roomId } = req.params;
+
+    const room = await roomService.fetchRoom(parseInt(roomId, 10));
+
+    return res.json({
+      status: true,
+      data: { room },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

@@ -1,4 +1,5 @@
 import { Room } from '@models/room.model';
+import createError from 'http-errors';
 
 /**
  * Creates new room from the given attributes.
@@ -24,4 +25,20 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
   return rooms;
 };
 
-export default { createRoom, fetchAllRooms };
+/**
+ * Fetches the room with the given id along with the room history.
+ * @param roomId
+ */
+export const fetchRoom = async (roomId: number): Promise<Room> => {
+  const room = await Room.findByPk(roomId, {
+    include: ['families'],
+  });
+
+  if (room === null) {
+    throw new createError.NotFound('Room with the given id does not exist.');
+  }
+
+  return room;
+};
+
+export default { createRoom, fetchAllRooms, fetchRoom };
