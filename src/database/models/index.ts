@@ -32,6 +32,12 @@ Family.belongsToMany(Room, {
   foreignKey: 'familyId',
 });
 
+export { User };
+export { Family };
+export { Member };
+export { Room };
+export { RoomFamilyHistory };
+
 export default {
   User,
   Family,

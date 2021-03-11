@@ -7,7 +7,7 @@ import express from 'express';
 import errorMiddleware from '@root/middlewares/error.middleware';
 import logger from '@root/helpers/logging/logging.helper';
 import routes from './routes/route';
-import User from './database/models/user.model';
+import { User } from './database/models';
 
 declare global {
   namespace Express {

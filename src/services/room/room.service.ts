@@ -1,5 +1,4 @@
-import db from '@models/index';
-import Room from '@root/database/models/room.model';
+import { Room } from '@models/index';
 import createError from 'http-errors';
 
 /**
@@ -11,10 +10,7 @@ export const createRoom = async (roomAttributes: {
   description?: string;
   price: number;
 }): Promise<Room> => {
-  const room = await db.Room.create({
-    ...roomAttributes,
-    status: 'EMPTY',
-  });
+  const room = await Room.create({ ...roomAttributes, status: 'EMPTY' });
   return room;
 };
 
@@ -22,7 +18,9 @@ export const createRoom = async (roomAttributes: {
  * Fetches all the rooms with the current family if any.
  */
 export const fetchAllRooms = async (): Promise<Room[]> => {
-  const rooms = await db.Room.findAll({ include: 'families' });
+  const rooms = await Room.findAll({
+    include: { association: 'families', required: false },
+  });
   return rooms;
 };
 
@@ -31,14 +29,11 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
  * @param roomId
  */
 export const fetchRoom = async (roomId: number): Promise<Room> => {
-  const room = await db.Room.findByPk(roomId, {
+  const room = await Room.findByPk(roomId, {
     include: ['families'],
   });
 
-  if (room === null) {
-    throw new createError.NotFound('Room with the given id does not exist.');
-  }
-
+  if (room === null) throw new createError.NotFound('Room not found.');
   return room;
 };
 

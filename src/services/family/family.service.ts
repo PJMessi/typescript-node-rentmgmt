@@ -1,10 +1,9 @@
-import db from '@models/index';
-import Family from '@root/database/models/family.model';
-import Room from '@root/database/models/room.model';
+import { Family, Room } from '@models/index';
 import createError from 'http-errors';
+import { Transaction } from 'sequelize/types';
 import sequelizeInstance from '../../database/connection';
 
-// parameter for createFamily function.
+// parameter for createFamily().
 type CreateFamilyParameter = {
   name: string;
   status: 'ACTIVE' | 'LEFT';
@@ -24,12 +23,52 @@ type CreateFamilyParameter = {
 export const createFamily = async (familyAttributes: CreateFamilyParameter) => {
   const { name, status, sourceOfIncome, membersList } = familyAttributes;
 
-  const family = await db.Family.create(
+  const family = await Family.create(
     { name, status, sourceOfIncome, members: membersList },
     { include: 'members' }
   );
 
   return family;
+};
+
+/**
+ * Removes the family from their room, if they had the room to begin with.
+ * @param family
+ * @param transaction
+ */
+const removeFamilyFromTheirRoom = async (
+  family: Family,
+  transaction: Transaction
+): Promise<void> => {
+  let rooms: Room[];
+  if (family.rooms) rooms = family.rooms;
+  else rooms = await family.getRooms();
+
+  const room = rooms[0];
+  if (room) {
+    await family.removeRoom(room, { transaction });
+
+    room.status = 'EMPTY';
+    await room.save({ transaction });
+  }
+};
+
+/**
+ * Assigns the family to the room.
+ * @param family
+ * @param room
+ * @param transaction
+ */
+const assignFamilyToRoom = async (
+  family: Family,
+  room: Room,
+  transaction: Transaction
+): Promise<void> => {
+  await family.addRoom(room, { transaction });
+
+  // eslint-disable-next-line no-param-reassign
+  room.status = 'OCCUPIED';
+  room.save({ transaction });
 };
 
 /**
@@ -41,41 +80,21 @@ export const assignRoom = async (
   familyId: number,
   roomId: number
 ): Promise<void> => {
-  const family = await db.Family.findByPk(familyId, {
-    include: {
-      association: 'rooms',
-      required: false,
-    },
+  const family = await Family.findByPk(familyId, {
+    include: { association: 'rooms', required: false },
   });
-  if (family === null) {
-    throw new createError.NotFound('Family not found.');
-  }
+  if (family === null) throw new createError.NotFound('Family not found.');
 
-  const room = await db.Room.findByPk(roomId);
-  if (room === null) {
-    throw new createError.NotFound('Room not found.');
-  }
+  const room = await Room.findByPk(roomId);
+  if (room === null) throw new createError.NotFound('Room not found.');
 
-  if (room.status === 'OCCUPIED') {
+  if (room.status === 'OCCUPIED')
     throw new createError.BadRequest('Room already occupied.');
-  }
 
   const transaction = await sequelizeInstance.transaction();
   try {
-    if (family.rooms && family.rooms.length > 0) {
-      const oldRoom: Room = family.rooms[0];
-
-      oldRoom.status = 'EMPTY';
-      await oldRoom.save({ transaction });
-
-      await oldRoom.removeFamily(family, { transaction });
-    }
-
-    await room.addFamily(family, { transaction });
-
-    room.status = 'OCCUPIED';
-    await room.save({ transaction });
-
+    await removeFamilyFromTheirRoom(family, transaction);
+    await assignFamilyToRoom(family, room, transaction);
     transaction.commit();
   } catch (error) {
     transaction.rollback();
@@ -89,14 +108,11 @@ export const assignRoom = async (
  * @param familyId
  */
 export const fetchFamily = async (familyId: number): Promise<void | Family> => {
-  const family = await db.Family.findByPk(familyId, {
+  const family = await Family.findByPk(familyId, {
     include: ['members', 'rooms'],
   });
 
-  if (family === null) {
-    throw new createError.NotFound('Room with the given id does not exist.');
-  }
-
+  if (family === null) throw new createError.NotFound('Room not found.');
   return family;
 };
 
