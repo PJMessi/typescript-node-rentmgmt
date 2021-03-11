@@ -4,9 +4,6 @@ import roomService from '@services/room/room.service';
 /**
  * POST /rooms
  * Creates new room.
- * @param req
- * @param res
- * @param next
  */
 export const createRoom = async (
   req: Request,
@@ -34,9 +31,6 @@ export const createRoom = async (
 /**
  * GET /rooms
  * Fetches all the rooms with the current family if any.
- * @param req
- * @param res
- * @param next
  */
 export const fetchAllRooms = async (
   req: Request,
@@ -57,9 +51,6 @@ export const fetchAllRooms = async (
 /**
  * GET /rooms/:roomId
  * Fetches the room with the given id along with the room history.
- * @param req
- * @param res
- * @param next
  */
 export const fetchRoom = async (
   req: Request,
@@ -83,9 +74,6 @@ export const fetchRoom = async (
 /**
  * POST /rooms/:roomId/families
  * Adds new family to the room.
- * @param req
- * @param res
- * @param next
  */
 export const addFamily = async (
   req: Request,
