@@ -1,7 +1,27 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Optional } from 'sequelize';
 import sequelizeInstance from '../connection';
 
-class RoomFamilyHistory extends Model {
+export interface RoomFamilyHistoryAttributes {
+  id: number;
+  roomId: number;
+  familyId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
+}
+
+export interface RoomFamilyHistoryCreationAttributes
+  extends Optional<
+    RoomFamilyHistoryAttributes,
+    'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
+  > {}
+
+class RoomFamilyHistory
+  extends Model<
+    RoomFamilyHistoryAttributes,
+    RoomFamilyHistoryCreationAttributes
+  >
+  implements RoomFamilyHistoryAttributes {
   public id!: number;
 
   public roomId!: number;
@@ -32,11 +52,11 @@ RoomFamilyHistory.init(
     },
     createdAt: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     deletedAt: {
       type: DataTypes.DATE,

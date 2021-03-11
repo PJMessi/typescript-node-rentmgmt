@@ -38,3 +38,53 @@ export const validateForCreateRoom = async (
     return next(error);
   }
 };
+
+/**
+ * POST /rooms/:roomId/family
+ * Validates data for above API.
+ * @param request
+ * @param response
+ * @param next
+ */
+// eslint-disable-next-line import/prefer-default-export
+export const validateForAddFamily = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const validationSchema = Joi.object({
+      name: Joi.string().required().max(255),
+      sourceOfIncome: Joi.string().required().max(255),
+      membersList: Joi.array()
+        .required()
+        .items({
+          name: Joi.string().required().max(255),
+          email: Joi.string().email(),
+          mobile: Joi.string().max(20),
+          birthDay: Joi.date().required(),
+        }),
+    }).options({ abortEarly: false });
+
+    const requestBody: {
+      name?: string;
+      sourceOfIncome: string;
+      membersList: {
+        name: string;
+        email?: string;
+        mobile?: string;
+        birthDay: Date;
+      }[];
+    } = request.body;
+
+    await validationSchema
+      .validateAsync(requestBody)
+      .catch((validationErrors) => {
+        throw new createError.UnprocessableEntity(validationErrors);
+      });
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};

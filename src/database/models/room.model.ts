@@ -2,15 +2,9 @@ import {
   Model,
   DataTypes,
   Optional,
-  HasManyRemoveAssociationMixin,
-  HasManyCountAssociationsMixin,
-  HasManyGetAssociationsMixin,
-  HasManySetAssociationsMixin,
-  HasManyAddAssociationsMixin,
-  HasManyAddAssociationMixin,
-  HasManyRemoveAssociationsMixin,
-  HasManyHasAssociationMixin,
-  HasManyHasAssociationsMixin,
+  HasOneGetAssociationMixin,
+  HasOneSetAssociationMixin,
+  HasOneCreateAssociationMixin,
 } from 'sequelize';
 import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
@@ -52,28 +46,14 @@ class Room
 
   public deletedAt!: Date;
 
-  public readonly families?: Family[];
+  public readonly family?: Family;
 
-  public getFamilies!: HasManyGetAssociationsMixin<Family>;
+  public getFamily!: HasOneGetAssociationMixin<Family>;
 
-  public setFamilies!: HasManySetAssociationsMixin<Family, number>;
+  public setFamily!: HasOneSetAssociationMixin<Family, number>;
 
-  public addFamilies!: HasManyAddAssociationsMixin<Family, number>;
-
-  public addFamily!: HasManyAddAssociationMixin<Family, number>;
-
-  // Does not provide type support. So better not use it.
-  // public createFamily!: HasManyCreateAssociationMixin<Family>;
-
-  public removeFamily!: HasManyRemoveAssociationMixin<Family, number>;
-
-  public removeFamilies!: HasManyRemoveAssociationsMixin<Family, number>;
-
-  public hasFamily!: HasManyHasAssociationMixin<Family, number>;
-
-  public hasFamilies!: HasManyHasAssociationsMixin<Family, number>;
-
-  public countFamilies!: HasManyCountAssociationsMixin;
+  // It doesnt provide type checking. So its better not to use it.
+  public createFamily!: HasOneCreateAssociationMixin<Family>;
 }
 
 Room.init(
@@ -116,6 +96,7 @@ Room.init(
     tableName: 'rooms',
     modelName: 'Room',
     sequelize: sequelizeInstance,
+    timestamps: true,
     paranoid: true,
   }
 );

@@ -2,15 +2,9 @@ import {
   Model,
   DataTypes,
   Optional,
-  HasManyGetAssociationsMixin,
-  HasManySetAssociationsMixin,
-  HasManyAddAssociationsMixin,
-  HasManyAddAssociationMixin,
-  HasManyRemoveAssociationMixin,
-  HasManyRemoveAssociationsMixin,
-  HasManyHasAssociationMixin,
-  HasManyHasAssociationsMixin,
-  HasManyCountAssociationsMixin,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  BelongsToCreateAssociationMixin,
 } from 'sequelize';
 import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
@@ -20,6 +14,7 @@ import Room from './room.model';
 
 export interface FamilyAttributes {
   id: number;
+  roomId: number;
   name: string;
   status: 'ACTIVE' | 'LEFT';
   sourceOfIncome: string;
@@ -41,6 +36,8 @@ class Family
   implements FamilyAttributes {
   public id!: number;
 
+  public roomId!: number;
+
   public name!: string;
 
   public status!: 'ACTIVE' | 'LEFT';
@@ -55,28 +52,14 @@ class Family
 
   public readonly members?: Member[];
 
-  public readonly rooms?: Room[];
+  public readonly room?: Room;
 
-  public getRooms!: HasManyGetAssociationsMixin<Room>;
+  public getRoom!: BelongsToGetAssociationMixin<Room>;
 
-  public setRooms!: HasManySetAssociationsMixin<Room, number>;
+  public setRoom!: BelongsToSetAssociationMixin<Room, number>;
 
-  public addRooms!: HasManyAddAssociationsMixin<Room, number>;
-
-  public addRoom!: HasManyAddAssociationMixin<Room, number>;
-
-  // Does not provide type support. So better not use it.
-  // public createRoom!: HasManyCreateAssociationMixin<Room>;
-
-  public removeRoom!: HasManyRemoveAssociationMixin<Room, number>;
-
-  public removeRooms!: HasManyRemoveAssociationsMixin<Room, number>;
-
-  public hasRoom!: HasManyHasAssociationMixin<Room, number>;
-
-  public hasRooms!: HasManyHasAssociationsMixin<Room, number>;
-
-  public countRooms!: HasManyCountAssociationsMixin;
+  // It doesnt provide type checking. So its better not to use it.
+  public createRoom!: BelongsToCreateAssociationMixin<Room>;
 }
 
 Family.init(
@@ -85,6 +68,10 @@ Family.init(
       type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
+    },
+    roomId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
@@ -115,6 +102,7 @@ Family.init(
     tableName: 'families',
     modelName: 'Family',
     sequelize: sequelizeInstance,
+    timestamps: true,
     paranoid: true,
   }
 );

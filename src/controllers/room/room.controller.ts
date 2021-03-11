@@ -79,3 +79,39 @@ export const fetchRoom = async (
     return next(error);
   }
 };
+
+/**
+ * POST /rooms/:roomId/families
+ * Adds new family to the room.
+ * @param req
+ * @param res
+ * @param next
+ */
+export const addFamily = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  try {
+    const familyId = parseInt(req.params.roomId, 10);
+    const requestBody: {
+      name: string;
+      sourceOfIncome: string;
+      membersList: {
+        name: string;
+        email?: string;
+        mobile?: string;
+        birthDay: Date;
+      }[];
+    } = req.body;
+
+    const family = await roomService.addFamily(familyId, requestBody);
+
+    return res.json({
+      success: true,
+      data: { family },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

@@ -1,5 +1,6 @@
-import { Room } from '@models/index';
+import { Family, Room } from '@models/index';
 import createError from 'http-errors';
+import sequelizeInstance from '@root/database/connection';
 
 /**
  * Creates new room from the given attributes.
@@ -19,7 +20,7 @@ export const createRoom = async (roomAttributes: {
  */
 export const fetchAllRooms = async (): Promise<Room[]> => {
   const rooms = await Room.findAll({
-    include: { association: 'families', required: false },
+    include: { association: 'family', required: false },
   });
   return rooms;
 };
@@ -30,11 +31,61 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
  */
 export const fetchRoom = async (roomId: number): Promise<Room> => {
   const room = await Room.findByPk(roomId, {
-    include: ['families'],
+    include: { association: 'family', required: false },
   });
 
   if (room === null) throw new createError.NotFound('Room not found.');
   return room;
 };
 
-export default { createRoom, fetchAllRooms, fetchRoom };
+// parameter for addFamily().
+type AddFamilyParameters = {
+  name: string;
+  sourceOfIncome: string;
+  membersList: {
+    name: string;
+    email?: string;
+    mobile?: string;
+    birthDay: Date;
+  }[];
+};
+
+/**
+ * Creates new family along with the family members.
+ * @param familyAttributes
+ */
+export const addFamily = async (
+  familyId: number,
+  familyAttributes: AddFamilyParameters
+) => {
+  const room = await Room.findByPk(familyId);
+  if (room === null) throw new createError.NotFound('Room not found.');
+  if (room.status === 'OCCUPIED')
+    throw new createError.BadRequest('Room already occupied.');
+
+  const transaction = await sequelizeInstance.transaction();
+  try {
+    const { name, sourceOfIncome, membersList } = familyAttributes;
+    const family = await Family.create(
+      {
+        name,
+        status: 'ACTIVE',
+        sourceOfIncome,
+        members: membersList,
+        roomId: room.id,
+      },
+      { include: ['members'], transaction }
+    );
+
+    room.status = 'OCCUPIED';
+    await room.save({ transaction });
+
+    await transaction.commit();
+    return family;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
+export default { createRoom, fetchAllRooms, fetchRoom, addFamily };

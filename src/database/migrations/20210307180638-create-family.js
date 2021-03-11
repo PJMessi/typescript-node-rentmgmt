@@ -7,6 +7,17 @@ module.exports.up = async (queryInterface, DataTypes) => {
       type: DataTypes.INTEGER,
     },
 
+    roomId: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'rooms',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+
     name: {
       allowNull: true,
       type: DataTypes.STRING,
