@@ -12,7 +12,9 @@ import Member, { MemberCreationAttributes } from './member.model';
 // eslint-disable-next-line import/no-cycle
 import Room from './room.model';
 // eslint-disable-next-line import/no-cycle
-import { RoomFamilyHistoryCreationAttributes } from './roomfamilyhistory.model';
+import RoomFamilyHistory, {
+  RoomFamilyHistoryCreationAttributes,
+} from './roomfamilyhistory.model';
 
 export interface FamilyAttributes {
   id: number;
@@ -31,7 +33,7 @@ export interface FamilyCreationAttributes
     'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
   > {
   members?: Omit<MemberCreationAttributes, 'familyId'>[];
-  history?: Omit<RoomFamilyHistoryCreationAttributes, 'familyId'>[];
+  histories?: Omit<RoomFamilyHistoryCreationAttributes, 'familyId'>[];
 }
 
 class Family
@@ -56,6 +58,8 @@ class Family
   public readonly members?: Member[];
 
   public readonly room?: Room;
+
+  public readonly histories?: RoomFamilyHistory[];
 
   public getRoom!: BelongsToGetAssociationMixin<Room>;
 
@@ -107,6 +111,11 @@ Family.init(
     sequelize: sequelizeInstance,
     timestamps: true,
     paranoid: true,
+    defaultScope: {
+      attributes: {
+        exclude: ['deletedAt'],
+      },
+    },
   }
 );
 

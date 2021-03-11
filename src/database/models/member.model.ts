@@ -90,6 +90,11 @@ Member.init(
     modelName: 'Member',
     sequelize: sequelizeInstance,
     paranoid: true,
+    defaultScope: {
+      attributes: {
+        exclude: ['deletedAt'],
+      },
+    },
   }
 );
 

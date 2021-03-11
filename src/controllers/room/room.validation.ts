@@ -5,11 +5,7 @@ import createError from 'http-errors';
 /**
  * POST /rooms
  * Validates data for above API.
- * @param request
- * @param response
- * @param next
  */
-// eslint-disable-next-line import/prefer-default-export
 export const validateForCreateRoom = async (
   request: Request,
   response: Response,
@@ -42,11 +38,7 @@ export const validateForCreateRoom = async (
 /**
  * POST /rooms/:roomId/family
  * Validates data for above API.
- * @param request
- * @param response
- * @param next
  */
-// eslint-disable-next-line import/prefer-default-export
 export const validateForAddFamily = async (
   request: Request,
   response: Response,

@@ -2,21 +2,20 @@ import { User } from '@models/index';
 import bcrypt from 'bcrypt';
 import createError from 'http-errors';
 
-/**
- * Checks if the user with given credentials exists. If yes, generates auth token.
- * @param credentials
- */
+/** Checks if the user with given credentials exists. If yes, generates auth token. */
 export const loginUser = async (credentials: {
   email: string;
   password: string;
 }): Promise<{ user: User; token: string }> => {
   const user = await User.findOne({ where: { email: credentials.email } });
+
   if (!user) throw new createError.Unauthorized('Invalid credentials.');
 
   const passwordMatches = await bcrypt.compare(
     credentials.password,
     user.password
   );
+
   if (!passwordMatches)
     throw new createError.Unauthorized('Invalid credentials.');
 
@@ -24,10 +23,7 @@ export const loginUser = async (credentials: {
   return { user, token };
 };
 
-/**
- * Creates user with given data and generates auth token.
- * @param userAttributes
- */
+/** Creates user with given data and generates auth token. */
 export const createUser = async (userAttributes: {
   email: string;
   name: string;
@@ -36,6 +32,7 @@ export const createUser = async (userAttributes: {
   const doesUserExist = await User.findOne({
     where: { email: userAttributes.email },
   });
+
   if (doesUserExist)
     throw new createError.BadRequest('User with the email already exist.');
 
@@ -48,10 +45,7 @@ export const createUser = async (userAttributes: {
   return { user, token };
 };
 
-/**
- * Fetches the user with given id.
- * @param id
- */
+/** Fetches the user with given id. */
 export const fetchUserById = async (id: number): Promise<User | null> => {
   const user = await User.findByPk(id);
   return user;

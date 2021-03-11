@@ -105,7 +105,10 @@ export const addFamily = async (
       }[];
     } = req.body;
 
-    const family = await roomService.addFamily(familyId, requestBody);
+    const family = await roomService.addFamily({
+      familyId,
+      familyAttributes: requestBody,
+    });
 
     return res.json({
       success: true,

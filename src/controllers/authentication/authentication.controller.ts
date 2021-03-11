@@ -5,9 +5,6 @@ import createError from 'http-errors';
 /**
  * POST /auth/register
  * Registers new user and provides auth token.
- * @param req
- * @param res
- * @param next
  */
 export const registerUser = async (
   req: Request,
@@ -35,9 +32,6 @@ export const registerUser = async (
 /**
  * POST /auth/login
  * Provides auth token if the credentials are valid.
- * @param req
- * @param res
- * @param next
  */
 export const loginuser = async (
   req: Request,
@@ -64,9 +58,6 @@ export const loginuser = async (
 /**
  * GET /auth/profile
  * Fetches the data of the user of the bearer token.
- * @param req
- * @param res
- * @param next
  */
 export const fetchProfile = async (
   req: Request,

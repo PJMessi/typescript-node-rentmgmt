@@ -105,6 +105,11 @@ RoomFamilyHistory.init(
     sequelize: sequelizeInstance,
     paranoid: true,
     timestamps: true,
+    defaultScope: {
+      attributes: {
+        exclude: ['deletedAt'],
+      },
+    },
   }
 );
 

@@ -5,9 +5,6 @@ import createError from 'http-errors';
 /**
  * POST /auth/register
  * Validates data for above API.
- * @param request
- * @param response
- * @param next
  */
 export const validateForLoginUser = async (
   request: Request,
@@ -40,9 +37,6 @@ export const validateForLoginUser = async (
 /**
  * POST /auth/login
  * Validates data for above API.
- * @param request
- * @param response
- * @param next
  */
 export const validateForRegisterUser = async (
   request: Request,

@@ -89,6 +89,11 @@ User.init(
     modelName: 'User',
     sequelize: sequelizeInstance,
     paranoid: true,
+    defaultScope: {
+      attributes: {
+        exclude: ['password', 'deletedAt'],
+      },
+    },
   }
 );
 

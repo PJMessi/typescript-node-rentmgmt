@@ -8,10 +8,7 @@ const parseBearerToken = (bearerToken: string): string => {
   return bearerToken.substring(7);
 };
 
-/**
- * Extracts User from the bearer token. Throws 401 if it token is invalid.
- * @param bearerToken
- */
+/** Extracts User from the bearer token. Throws 401 if it token is invalid. */
 const decodeData = (bearerToken: string): JwtEncodedUserData => {
   try {
     const JWT_SECRET = process.env.JWT_KEY || '';
@@ -22,13 +19,8 @@ const decodeData = (bearerToken: string): JwtEncodedUserData => {
   }
 };
 
-/**
- * Decodes the token and extracts the user's id. Fetches that user from the database and appends
- * it in the request. Throws 401 if token is invalid or user doesnt exist anymore.
- * @param req
- * @param res
- * @param next
- */
+/** Decodes the token and extracts the user's id. Fetches that user from the database and appends
+ * it in the request. Throws 401 if token is invalid or user doesnt exist anymore. */
 export default async (
   req: Request,
   res: Response,

@@ -50,7 +50,7 @@ class Room
 
   public readonly family?: Family;
 
-  public readonly history?: RoomFamilyHistory;
+  public readonly histories?: RoomFamilyHistory[];
 
   public getFamily!: HasOneGetAssociationMixin<Family>;
 
@@ -102,6 +102,11 @@ Room.init(
     sequelize: sequelizeInstance,
     timestamps: true,
     paranoid: true,
+    defaultScope: {
+      attributes: {
+        exclude: ['deletedAt'],
+      },
+    },
   }
 );
 

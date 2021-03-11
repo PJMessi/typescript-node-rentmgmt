@@ -1,23 +1,16 @@
-import { Family, Room, RoomFamilyHistory } from '@models/index';
+import { Family, Room } from '@models/index';
 import createError from 'http-errors';
 import sequelizeInstance from '@root/database/connection';
 
-/**
- * Creates new room from the given attributes.
- * @param roomAttributes
- */
-export const createRoom = async (roomAttributes: {
-  name: string;
-  description?: string;
-  price: number;
-}): Promise<Room> => {
+/** Creates new room from the given attributes. */
+export const createRoom = async (
+  roomAttributes: CreateRoomParameters
+): Promise<Room> => {
   const room = await Room.create({ ...roomAttributes, status: 'EMPTY' });
   return room;
 };
 
-/**
- * Fetches all the rooms with the current family if any.
- */
+/** Fetches all the rooms with the current family if any. */
 export const fetchAllRooms = async (): Promise<Room[]> => {
   const rooms = await Room.findAll({
     include: { association: 'family', required: false },
@@ -25,41 +18,33 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
   return rooms;
 };
 
-/**
- * Fetches the room with the given id along with the room history.
- * @param roomId
- */
+/** Fetches the room with the given id along with the room history. */
 export const fetchRoom = async (roomId: number): Promise<Room> => {
   const room = await Room.findByPk(roomId, {
-    include: { association: 'family', required: false },
+    include: [
+      'family',
+      {
+        association: 'histories',
+        attributes: {
+          include: ['deletedAt'],
+        },
+        paranoid: false,
+        include: [{ association: 'family', paranoid: false }],
+      },
+    ],
   });
 
   if (room === null) throw new createError.NotFound('Room not found.');
   return room;
 };
 
-// parameter for addFamily().
-type AddFamilyParameters = {
-  name: string;
-  sourceOfIncome: string;
-  membersList: {
-    name: string;
-    email?: string;
-    mobile?: string;
-    birthDay: Date;
-  }[];
-};
+/** Creates new family along with the family members. */
+export const addFamily = async (parameters: AddFamilyParameters) => {
+  const { familyId, familyAttributes } = parameters;
 
-/**
- * Creates new family along with the family members.
- * @param familyAttributes
- */
-export const addFamily = async (
-  familyId: number,
-  familyAttributes: AddFamilyParameters
-) => {
   const room = await Room.findByPk(familyId);
   if (room === null) throw new createError.NotFound('Room not found.');
+
   if (room.status === 'OCCUPIED')
     throw new createError.BadRequest('Room already occupied.');
 
@@ -67,7 +52,6 @@ export const addFamily = async (
   try {
     const { name, sourceOfIncome, membersList } = familyAttributes;
 
-    // creating family and members and relating it to the room..
     const family = await Family.create(
       {
         name,
@@ -75,31 +59,20 @@ export const addFamily = async (
         sourceOfIncome,
         members: membersList,
         roomId: room.id,
-        history: [
+        histories: [
           {
             roomId: room.id,
             amount: room.price,
           },
         ],
       },
-      { include: ['members', 'history'], transaction }
+      { include: ['members', 'histories'], transaction }
     );
 
-    // updating room status.
-    room.status = 'OCCUPIED';
-    await room.save({ transaction });
-
-    // updating history.
-    await RoomFamilyHistory.create(
-      {
-        roomId: room.id,
-        familyId: family.id,
-        amount: room.price,
-      },
-      { transaction }
-    );
+    await room.update({ status: 'OCCUPIED' });
 
     await transaction.commit();
+
     return family;
   } catch (error) {
     await transaction.rollback();
@@ -108,3 +81,23 @@ export const addFamily = async (
 };
 
 export default { createRoom, fetchAllRooms, fetchRoom, addFamily };
+
+type CreateRoomParameters = {
+  name: string;
+  description?: string;
+  price: number;
+};
+
+type AddFamilyParameters = {
+  familyId: number;
+  familyAttributes: {
+    name: string;
+    sourceOfIncome: string;
+    membersList: {
+      name: string;
+      email?: string;
+      mobile?: string;
+      birthDay: Date;
+    }[];
+  };
+};
