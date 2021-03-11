@@ -30,6 +30,25 @@ Family.belongsTo(Room, {
   as: 'room',
 });
 
+// Relation between Room, Family and RoomFamilyHistory.
+RoomFamilyHistory.belongsTo(Room, {
+  targetKey: 'id',
+  foreignKey: 'roomId',
+  as: 'room',
+});
+
+RoomFamilyHistory.belongsTo(Family, {
+  targetKey: 'id',
+  foreignKey: 'familyId',
+  as: 'family',
+});
+
+Family.hasMany(RoomFamilyHistory, {
+  sourceKey: 'id',
+  foreignKey: 'familyId',
+  as: 'history',
+});
+
 export { User };
 export { Family };
 export { Member };

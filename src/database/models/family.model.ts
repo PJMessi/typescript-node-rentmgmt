@@ -11,6 +11,8 @@ import sequelizeInstance from '../connection';
 import Member, { MemberCreationAttributes } from './member.model';
 // eslint-disable-next-line import/no-cycle
 import Room from './room.model';
+// eslint-disable-next-line import/no-cycle
+import { RoomFamilyHistoryCreationAttributes } from './roomfamilyhistory.model';
 
 export interface FamilyAttributes {
   id: number;
@@ -29,6 +31,7 @@ export interface FamilyCreationAttributes
     'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
   > {
   members?: Omit<MemberCreationAttributes, 'familyId'>[];
+  history?: Omit<RoomFamilyHistoryCreationAttributes, 'familyId'>[];
 }
 
 class Family

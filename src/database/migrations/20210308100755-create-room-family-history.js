@@ -29,6 +29,11 @@ module.exports.up = async (queryInterface, DataTypes) => {
       onUpdate: 'CASCADE',
     },
 
+    amount: {
+      allowNull: true,
+      type: DataTypes.DECIMAL(8, 2),
+    },
+
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

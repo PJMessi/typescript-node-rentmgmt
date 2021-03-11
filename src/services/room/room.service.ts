@@ -1,4 +1,4 @@
-import { Family, Room } from '@models/index';
+import { Family, Room, RoomFamilyHistory } from '@models/index';
 import createError from 'http-errors';
 import sequelizeInstance from '@root/database/connection';
 
@@ -66,6 +66,8 @@ export const addFamily = async (
   const transaction = await sequelizeInstance.transaction();
   try {
     const { name, sourceOfIncome, membersList } = familyAttributes;
+
+    // creating family and members and relating it to the room..
     const family = await Family.create(
       {
         name,
@@ -73,12 +75,29 @@ export const addFamily = async (
         sourceOfIncome,
         members: membersList,
         roomId: room.id,
+        history: [
+          {
+            roomId: room.id,
+            amount: room.price,
+          },
+        ],
       },
-      { include: ['members'], transaction }
+      { include: ['members', 'history'], transaction }
     );
 
+    // updating room status.
     room.status = 'OCCUPIED';
     await room.save({ transaction });
+
+    // updating history.
+    await RoomFamilyHistory.create(
+      {
+        roomId: room.id,
+        familyId: family.id,
+        amount: room.price,
+      },
+      { transaction }
+    );
 
     await transaction.commit();
     return family;
