@@ -1,3 +1,4 @@
+// This config is basically used for sequelize-cli only.
 require('dotenv').config();
 
 module.exports.development = {

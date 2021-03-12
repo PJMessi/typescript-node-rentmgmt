@@ -5,6 +5,7 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   BelongsToCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
 } from 'sequelize';
 import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
@@ -67,6 +68,8 @@ class Family
 
   // It doesnt provide type checking. So its better not to use it.
   public createRoom!: BelongsToCreateAssociationMixin<Room>;
+
+  public getHistories!: HasManyGetAssociationsMixin<RoomFamilyHistory>;
 }
 
 Family.init(
