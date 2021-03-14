@@ -8,10 +8,10 @@ const request = supertest(app);
 describe('Family APIs', () => {
   describe('POST /families/:familyId/rooms/:roomId/change', () => {
     it('should return 401 and an error message if bearer token is not provided.', async () => {
-      /** calling the test api. */
+      /** calling the test api------------------------------------------------------------------------ */
       const apiResult = await request.post(`/families/1/rooms/1/change`);
 
-      /** checking the results. */
+      /** checking the results------------------------------------------------------------------------ */
       assert.equal(
         apiResult.status,
         401,
@@ -28,12 +28,12 @@ describe('Family APIs', () => {
     });
 
     it('should return 401 and an error message if invalid bearer token is provided.', async () => {
-      /** calling the test api. */
+      /** calling the test api------------------------------------------------------------------------ */
       const apiResult = await request
         .post(`/families/1/rooms/1/change`)
         .set('Authorization', 'Bearer invalidbearertoken');
 
-      /** checking the results. */
+      /** checking the results------------------------------------------------------------------------ */
       assert.equal(
         apiResult.status,
         401,

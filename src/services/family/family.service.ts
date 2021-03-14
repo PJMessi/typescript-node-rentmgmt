@@ -56,7 +56,7 @@ export const fetchFamily = async (familyId: number): Promise<Family> => {
     include: ['members', 'room', 'histories'],
   });
 
-  if (family === null) throw new createError.NotFound('Room not found.');
+  if (family === null) throw new createError.NotFound('Family not found.');
   return family;
 };
 
