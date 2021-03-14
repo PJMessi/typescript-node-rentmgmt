@@ -15,7 +15,7 @@ const decodeData = (bearerToken: string): JwtEncodedUserData => {
     const jwtPayload = <JwtEncodedUserData>jwt.verify(bearerToken, JWT_SECRET);
     return jwtPayload;
   } catch (error) {
-    throw new createError.Unauthorized();
+    throw new createError.Unauthorized('Invalid bearer token.');
   }
 };
 
@@ -36,7 +36,7 @@ export default async (
     );
 
     const user = await fetchUserById(decodedUser.id);
-    if (!user) throw new createError.Unauthorized();
+    if (!user) throw new createError.Unauthorized('Invalid bearer token.');
 
     req.auth = { user };
 

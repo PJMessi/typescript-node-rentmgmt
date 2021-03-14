@@ -19,7 +19,7 @@ export const changeRoom = async (
     );
 
     return res.json({
-      status: true,
+      success: true,
       data: { family },
     });
   } catch (error) {
@@ -42,7 +42,7 @@ export const fetchFamily = async (
     const family = await familyService.fetchFamily(parseInt(familyId, 10));
 
     return res.json({
-      status: true,
+      success: true,
       data: { family },
     });
   } catch (error) {

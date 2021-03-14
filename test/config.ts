@@ -8,10 +8,10 @@ dotenv.config({
 import 'module-alias/register';
 import sequelizeInstance from '../src/database/connection';
 
-before(async () => {
+beforeEach(async () => {
   await sequelizeInstance.sync();
 });
 
 afterEach(async () => {
-  await sequelizeInstance.truncate();
+  await sequelizeInstance.drop();
 });
