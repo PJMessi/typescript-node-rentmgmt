@@ -1,5 +1,6 @@
 import { Family, Room } from '@models/index';
 import createError from 'http-errors';
+import sendWelcomeEmail from '@helpers/email/welcomeEmail/welcomeEmail';
 import sequelizeInstance from '@root/database/connection';
 
 /** Creates new room from the given attributes. */
@@ -41,6 +42,19 @@ export const fetchRoom = async (roomId: number): Promise<Room> => {
   return room;
 };
 
+/** Sends welcome email to all the members of the given family. */
+export const sendWelcomeEmailToFamily = async (family: Family) => {
+  let { members } = family;
+
+  if (!members) {
+    members = await family.getMembers();
+  }
+
+  members.forEach((member) => {
+    sendWelcomeEmail(member);
+  });
+};
+
 /** Creates new family along with the family members. */
 export const addFamily = async (
   parameters: AddFamilyParameters
@@ -74,9 +88,11 @@ export const addFamily = async (
       { include: ['members', 'histories'], transaction }
     );
 
-    await room.update({ status: 'OCCUPIED' });
+    await room.update({ status: 'OCCUPIED' }, { transaction });
 
     await transaction.commit();
+
+    sendWelcomeEmailToFamily(family);
 
     return family;
   } catch (error) {

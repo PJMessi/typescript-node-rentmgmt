@@ -70,6 +70,8 @@ class Family
   public createRoom!: BelongsToCreateAssociationMixin<Room>;
 
   public getHistories!: HasManyGetAssociationsMixin<RoomFamilyHistory>;
+
+  public getMembers!: HasManyGetAssociationsMixin<Member>;
 }
 
 Family.init(

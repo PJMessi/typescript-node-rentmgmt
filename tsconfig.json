@@ -1,42 +1,43 @@
 {
-    "compilerOptions": {
-      "target": "es6",
-      "module": "commonjs",
-      "allowJs": true,
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "strict": true,
-      "baseUrl": "./src",
-      "paths": {
-        "@root/*": [
-          "./*"
-        ],
-        "@middlewares/*": [
-          "middlewares/*"
-        ],
-        "@services/*": [
-          "services/*"
-        ],
-        "@routes/*": [
-          "routes/*"
-        ],
-        "@controllers/*": [
-          "controllers/*"
-        ],
-        "@models/*": [
-          "database/models/*"
-        ],
-        "@helpers/*": [
-          "helpers/*"
-        ]
-      },
-      "types": [
-        "node", "mocha"
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "allowJs": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@root/*": [
+        "./*"
       ],
-      "esModuleInterop": true,
-      "experimentalDecorators": true,
-      "emitDecoratorMetadata": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true
-    }
+      "@middlewares/*": [
+        "middlewares/*"
+      ],
+      "@services/*": [
+        "services/*"
+      ],
+      "@routes/*": [
+        "routes/*"
+      ],
+      "@controllers/*": [
+        "controllers/*"
+      ],
+      "@models/*": [
+        "database/models/*"
+      ],
+      "@helpers/*": [
+        "helpers/*"
+      ]
+    },
+    "types": [
+      "node",
+      "mocha"
+    ],
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   }
+}
