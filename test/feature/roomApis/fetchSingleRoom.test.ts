@@ -1,13 +1,13 @@
 import supertest from 'supertest';
 import app from '@root/app';
-import { Room, User } from '@root/database/models';
+import { Member, Room, User } from '@root/database/models';
 import { assert } from 'chai';
 
 const request = supertest(app);
 
-describe('GET /families/:familyId', () => {
+describe('GET /rooms/:roomId', () => {
   describe('success', () => {
-    it('should return 200 with family info along with its members, room and price info.', async () => {
+    it('should return 200 with room info along with the info of the family and members in it.', async () => {
       /** creating dependencies----------------------------------------------------------------------- */
       // creating a user for auth token.
       const user = await User.create({
@@ -17,21 +17,21 @@ describe('GET /families/:familyId', () => {
       });
       const token = user.generateToken();
 
-      // calling api to create a new room to act as the current room for the family.
+      // calling api to create a new room.
       await request
         .post('/rooms')
         .send({
-          name: 'Current Room',
+          name: 'Room 1',
           price: 5000,
         })
         .set('Authorization', `Bearer ${token}`);
-      const currentRoom = await Room.findOne({
-        where: { name: 'Current Room' },
+      const room = await Room.findOne({
+        where: { name: 'Room 1' },
       });
 
-      // calling api to add new family to the current room.
+      // calling api to add new family to the room.
       await request
-        .post(`/rooms/${currentRoom?.id}/families`)
+        .post(`/rooms/${room?.id}/families`)
         .send({
           name: 'Test family',
           sourceOfIncome: 'Some jobs',
@@ -45,87 +45,59 @@ describe('GET /families/:familyId', () => {
           ],
         })
         .set('Authorization', `Bearer ${token}`);
-      const family = await currentRoom?.getFamily()!;
+      const family = await room?.getFamily()!;
+      const member = await Member.findOne({
+        where: { familyId: family?.id },
+      });
 
       /** calling the test api------------------------------------------------------------------------ */
       const apiResult = await request
-        .get(`/families/${family.id}`)
+        .get(`/rooms/${room?.id}`)
         .set('Authorization', `Bearer ${token}`);
 
       /** checking the results------------------------------------------------------------------------ */
-      await family.reload({ include: ['room', 'histories', 'members'] });
-      assert.equal(
-        apiResult.status,
-        200,
-        'API should return 200 if all the provided data are valid.'
-      );
+      await room?.reload({ include: ['family'] });
+      assert.equal(apiResult.status, 200, 'API should return 200 response.');
 
-      const familyInApiResult = apiResult.body.data.family;
-      assert.include(
-        familyInApiResult,
-        {
-          id: family.id,
-          roomId: currentRoom?.id,
-          name: family.name,
-          status: family.status,
-          sourceOfIncome: family.sourceOfIncome,
-          createdAt: family.createdAt.toISOString(),
-          updatedAt: family.updatedAt.toISOString(),
-        },
-        'API should return the family info if all the data are valid.'
-      );
-
-      const members = family.members!;
-      const membersInApiResult = familyInApiResult.members;
-      assert.include(
-        membersInApiResult[0],
-        {
-          id: members[0].id,
-          familyId: family.id,
-          name: members[0].name,
-          email: members[0].email,
-          mobile: members[0].mobile,
-          birthDay: members[0].birthDay.toISOString(),
-          createdAt: members[0].createdAt.toISOString(),
-          updatedAt: members[0].updatedAt.toISOString(),
-        },
-        'API should return the members info along with the family info if all the data are valid.'
-      );
-
-      await currentRoom?.reload();
-      const roomInApiResult = familyInApiResult.room;
+      const roomInApiResult = apiResult.body.data.room;
       assert.include(
         roomInApiResult,
         {
-          id: currentRoom?.id,
-          name: currentRoom?.name,
-          price: currentRoom?.price,
-          createdAt: currentRoom?.createdAt.toISOString(),
-          updatedAt: currentRoom?.updatedAt.toISOString(),
+          id: room?.id,
+          price: room?.price,
+          name: room?.name,
+          createdAt: room?.createdAt.toISOString(),
+          updatedAt: room?.updatedAt.toISOString(),
         },
-        'API should return the room info along with the family info if all the data are valid.'
+        'API should return the room info.'
       );
 
-      const histories = await family.getHistories()!;
-      const historyInApiResult = familyInApiResult.histories;
-      assert.include(
-        historyInApiResult[0],
-        {
-          id: histories[0].id,
-          familyId: histories[0].familyId,
-          roomId: histories[0].roomId,
-          createdAt: histories[0].createdAt.toISOString(),
-          updatedAt: histories[0].updatedAt.toISOString(),
-        },
-        'API should return the price info along with the family info if all the data are valid.'
-      );
+      const familyInApiResult = roomInApiResult.family;
+      assert.include(familyInApiResult, {
+        id: family?.id,
+        name: family?.name,
+        status: family?.status,
+        createdAt: family?.createdAt.toISOString(),
+        updatedAt: family?.updatedAt.toISOString(),
+      });
+
+      const membersInApiResult = familyInApiResult.members;
+      assert.include(membersInApiResult[0], {
+        id: member?.id,
+        familyId: member?.familyId,
+        email: member?.email,
+        mobile: member?.mobile,
+        birthDay: member?.birthDay.toISOString(),
+        createdAt: member?.createdAt.toISOString(),
+        updatedAt: member?.updatedAt.toISOString(),
+      });
     });
   });
 
   describe('error', () => {
     it('should return 401 and an error message if bearer token is not provided.', async () => {
       /** calling the test api------------------------------------------------------------------------ */
-      const apiResult = await request.get(`/families/1`);
+      const apiResult = await request.get(`/rooms/1`);
 
       /** checking the results------------------------------------------------------------------------ */
       assert.equal(
@@ -146,7 +118,7 @@ describe('GET /families/:familyId', () => {
     it('should return 401 and an error message if invalid bearer token is provided.', async () => {
       /** calling the test api------------------------------------------------------------------------ */
       const apiResult = await request
-        .get(`/families/1`)
+        .get(`/rooms/1`)
         .set('Authorization', 'Bearer invalidbearertoken');
 
       /** checking the results------------------------------------------------------------------------ */
@@ -165,7 +137,7 @@ describe('GET /families/:familyId', () => {
       );
     });
 
-    it('should return 404 and an error message if the family doesnt exist.', async () => {
+    it('should return 404 and an error message if the room doesnt exist.', async () => {
       /** creating dependencies----------------------------------------------------------------------- */
       // creating a user for auth token.
       const user = await User.create({
@@ -177,22 +149,22 @@ describe('GET /families/:familyId', () => {
 
       /** calling the test api------------------------------------------------------------------------ */
       const apiResult = await request
-        .get(`/families/1`)
+        .get(`/rooms/1`)
         .set('Authorization', `Bearer ${token}`);
 
       /** checking the results------------------------------------------------------------------------ */
       assert.equal(
         apiResult.status,
         404,
-        'API should return 404 if the family with the given id doesnt exist.'
+        'API should return 404 if the room with the given id doesnt exist.'
       );
       assert.include(
         apiResult.body,
         {
           success: false,
-          message: 'Family not found.',
+          message: 'Room not found.',
         },
-        'API should return proper message if the family with the given id doesnt exist.'
+        'API should return proper message if the room with the given id doesnt exist.'
       );
     });
   });

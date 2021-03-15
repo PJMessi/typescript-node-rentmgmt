@@ -22,7 +22,10 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
 export const fetchRoom = async (roomId: number): Promise<Room> => {
   const room = await Room.findByPk(roomId, {
     include: [
-      'family',
+      {
+        association: 'family',
+        include: ['members'],
+      },
       {
         association: 'histories',
         attributes: {
