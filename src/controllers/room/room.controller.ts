@@ -20,7 +20,7 @@ export const createRoom = async (
     const room = await roomService.createRoom(reqBody);
 
     return res.json({
-      status: true,
+      success: true,
       data: { room },
     });
   } catch (error) {
@@ -40,7 +40,7 @@ export const fetchAllRooms = async (
   try {
     const rooms = await roomService.fetchAllRooms();
     return res.json({
-      status: true,
+      success: true,
       data: { rooms },
     });
   } catch (error) {
@@ -63,7 +63,7 @@ export const fetchRoom = async (
     const room = await roomService.fetchRoom(parseInt(roomId, 10));
 
     return res.json({
-      status: true,
+      success: true,
       data: { room },
     });
   } catch (error) {

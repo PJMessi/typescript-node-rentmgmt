@@ -101,7 +101,7 @@ describe('POST /rooms', () => {
     });
 
     describe('validation', () => {
-      it('should throw validation error if name is not provided or has greater than 255 characters.', async () => {
+      it('should return 422 and error details if name is not provided or has greater than 255 characters.', async () => {
         /** creating dependencies----------------------------------------------------------------------- */
         // creating a user for auth token.
         const user = await User.create({
@@ -187,7 +187,7 @@ describe('POST /rooms', () => {
         );
       });
 
-      it('should throw validation error if price is not provided or is greater than 999999.99.', async () => {
+      it('should return 422 and error details if price is not provided or is greater than 999999.99.', async () => {
         /** creating dependencies----------------------------------------------------------------------- */
         // creating a user for auth token.
         const user = await User.create({
@@ -272,7 +272,7 @@ describe('POST /rooms', () => {
         );
       });
 
-      it('should throw validaton error if description has greater than 255 characters.', async () => {
+      it('should return 422 and error details if description has greater than 255 characters.', async () => {
         /** creating dependencies----------------------------------------------------------------------- */
         // creating a user for auth token.
         const user = await User.create({

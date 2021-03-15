@@ -42,7 +42,9 @@ export const fetchRoom = async (roomId: number): Promise<Room> => {
 };
 
 /** Creates new family along with the family members. */
-export const addFamily = async (parameters: AddFamilyParameters) => {
+export const addFamily = async (
+  parameters: AddFamilyParameters
+): Promise<Family> => {
   const { familyId, familyAttributes } = parameters;
 
   const room = await Room.findByPk(familyId);
