@@ -7,16 +7,9 @@ import express from 'express';
 import errorMiddleware from '@root/middlewares/error.middleware';
 import logger from '@root/helpers/logging/logging.helper';
 import path from 'path';
+import '@root/crons/backupDatabase';
 import routes from './routes/route';
-import { User } from './database/models';
-
-declare global {
-  namespace Express {
-    interface Request {
-      auth: { user?: User };
-    }
-  }
-}
+import '@root/customTypes';
 
 const app = express();
 
