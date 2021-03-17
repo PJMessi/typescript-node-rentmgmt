@@ -31,11 +31,11 @@ class User
 
   public password!: string;
 
-  public createdAt!: Date;
+  public readonly createdAt!: Date;
 
-  public updatedAt!: Date;
+  public readonly updatedAt!: Date;
 
-  public deletedAt!: Date;
+  public readonly deletedAt!: Date;
 
   public generateToken = (): string => {
     const secret = process.env.JWT_SECRET || 'jsonwebtoken';

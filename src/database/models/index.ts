@@ -3,6 +3,7 @@ import Family from './family.model';
 import Member from './member.model';
 import Room from './room.model';
 import RoomFamilyHistory from './roomfamilyhistory.model';
+import Invoice from './invoice.model';
 
 // Relation between Member and family.
 Family.hasMany(Member, {
@@ -60,6 +61,7 @@ export { Family };
 export { Member };
 export { Room };
 export { RoomFamilyHistory };
+export { Invoice };
 
 export default {
   User,
@@ -67,4 +69,5 @@ export default {
   Member,
   Room,
   RoomFamilyHistory,
+  Invoice,
 };

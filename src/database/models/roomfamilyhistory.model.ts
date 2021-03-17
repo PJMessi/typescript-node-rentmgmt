@@ -19,7 +19,7 @@ export interface RoomFamilyHistoryAttributes {
   amount: number;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 }
 
 export interface RoomFamilyHistoryCreationAttributes
@@ -46,7 +46,7 @@ class RoomFamilyHistory
 
   public updatedAt!: Date;
 
-  public deletedAt!: Date;
+  public deletedAt!: Date | null;
 
   public readonly room?: Room;
 
