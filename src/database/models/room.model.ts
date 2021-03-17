@@ -3,8 +3,6 @@ import {
   DataTypes,
   Optional,
   HasOneGetAssociationMixin,
-  HasOneSetAssociationMixin,
-  HasOneCreateAssociationMixin,
 } from 'sequelize';
 import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
@@ -18,7 +16,7 @@ export interface RoomAttributes {
   price: number;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 }
 
 export interface RoomCreationAttributes
@@ -30,7 +28,7 @@ export interface RoomCreationAttributes
 class Room
   extends Model<RoomAttributes, RoomCreationAttributes>
   implements RoomAttributes {
-  public id!: number;
+  public readonly id!: number;
 
   public name!: string;
 
@@ -40,20 +38,17 @@ class Room
 
   public price!: number;
 
-  public createdAt!: Date;
+  public readonly createdAt!: Date;
 
-  public updatedAt!: Date;
+  public readonly updatedAt!: Date;
 
-  public deletedAt!: Date;
+  public readonly deletedAt!: Date | null;
+
+  // Relations.
 
   public readonly family?: Family;
 
   public getFamily!: HasOneGetAssociationMixin<Family>;
-
-  public setFamily!: HasOneSetAssociationMixin<Family, number>;
-
-  // It doesnt provide type checking. So its better not to use it.
-  public createFamily!: HasOneCreateAssociationMixin<Family>;
 }
 
 Room.init(
@@ -63,30 +58,37 @@ Room.init(
       autoIncrement: true,
       primaryKey: true,
     },
+
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     description: {
       type: DataTypes.STRING,
       allowNull: true,
     },
+
     status: {
       type: DataTypes.ENUM('OCCUPIED', 'EMPTY'),
       allowNull: false,
     },
+
     price: {
       type: DataTypes.DECIMAL(8, 2),
       allowNull: true,
     },
+
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,

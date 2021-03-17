@@ -3,8 +3,6 @@ import {
   DataTypes,
   Optional,
   BelongsToGetAssociationMixin,
-  BelongsToSetAssociationMixin,
-  BelongsToCreateAssociationMixin,
   HasManyGetAssociationsMixin,
 } from 'sequelize';
 import sequelizeInstance from '../connection';
@@ -19,9 +17,10 @@ export interface FamilyAttributes {
   name: string;
   status: 'ACTIVE' | 'LEFT';
   sourceOfIncome: string;
+  amount: number;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 }
 
 export interface FamilyCreationAttributes
@@ -35,7 +34,7 @@ export interface FamilyCreationAttributes
 class Family
   extends Model<FamilyAttributes, FamilyCreationAttributes>
   implements FamilyAttributes {
-  public id!: number;
+  public readonly id!: number;
 
   public roomId!: number;
 
@@ -45,22 +44,21 @@ class Family
 
   public sourceOfIncome!: string;
 
-  public createdAt!: Date;
+  public amount!: number;
 
-  public updatedAt!: Date;
+  public readonly createdAt!: Date;
 
-  public deletedAt!: Date;
+  public readonly updatedAt!: Date;
+
+  public readonly deletedAt!: Date;
+
+  // Relations.
 
   public readonly members?: Member[];
 
   public readonly room?: Room;
 
   public getRoom!: BelongsToGetAssociationMixin<Room>;
-
-  public setRoom!: BelongsToSetAssociationMixin<Room, number>;
-
-  // It doesnt provide type checking. So its better not to use it.
-  public createRoom!: BelongsToCreateAssociationMixin<Room>;
 
   public getMembers!: HasManyGetAssociationsMixin<Member>;
 }
@@ -72,30 +70,42 @@ Family.init(
       autoIncrement: true,
       primaryKey: true,
     },
+
     roomId: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     status: {
       type: DataTypes.ENUM('ACTIVE', 'LEFT'),
       allowNull: false,
     },
+
     sourceOfIncome: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
+    amount: {
+      type: DataTypes.DECIMAL(8, 2),
+      allowNull: false,
+    },
+
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,

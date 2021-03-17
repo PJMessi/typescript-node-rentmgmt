@@ -8,7 +8,6 @@ export const loginUser = async (credentials: {
   password: string;
 }): Promise<{ user: User; token: string }> => {
   const user = await User.findOne({ where: { email: credentials.email } });
-
   if (!user) throw new createError.Unauthorized('Invalid credentials.');
 
   const passwordMatches = await bcrypt.compare(
@@ -20,6 +19,7 @@ export const loginUser = async (credentials: {
     throw new createError.Unauthorized('Invalid credentials.');
 
   const token = user.generateToken();
+
   return { user, token };
 };
 
@@ -36,10 +36,7 @@ export const createUser = async (userAttributes: {
   if (doesUserExist)
     throw new createError.BadRequest('User with the email already exist.');
 
-  const user = await User.create({
-    ...userAttributes,
-    password: await bcrypt.hash(userAttributes.password, 10),
-  });
+  const user = await User.create(userAttributes);
 
   const token = user.generateToken();
   return { user, token };

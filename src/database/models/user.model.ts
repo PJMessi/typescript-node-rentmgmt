@@ -1,5 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import sequelizeInstance from '../connection';
 
 export interface UserAttributes {
@@ -9,7 +10,7 @@ export interface UserAttributes {
   password: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 }
 
 export type JwtEncodedUserData = Omit<UserAttributes, 'password' | 'deletedAt'>;
@@ -23,7 +24,7 @@ export interface UserCreationAttributes
 class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes {
-  public id!: number;
+  public readonly id!: number;
 
   public name!: string;
 
@@ -35,7 +36,7 @@ class User
 
   public readonly updatedAt!: Date;
 
-  public readonly deletedAt!: Date;
+  public readonly deletedAt!: Date | null;
 
   public generateToken = (): string => {
     const secret = process.env.JWT_SECRET || 'jsonwebtoken';
@@ -49,6 +50,10 @@ class User
     const token = jwt.sign(dataToEncode, secret);
     return token;
   };
+
+  public toJSON = (): object => {
+    return { ...super.toJSON(), password: undefined };
+  };
 }
 
 User.init(
@@ -58,27 +63,33 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
+
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
     },
+
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -91,10 +102,16 @@ User.init(
     paranoid: true,
     defaultScope: {
       attributes: {
-        exclude: ['password', 'deletedAt'],
+        exclude: ['deletedAt'],
       },
     },
   }
 );
+
+User.beforeCreate(async (user) => {
+  const hashedPassword = await bcrypt.hash(user.password, 10);
+  // eslint-disable-next-line no-param-reassign
+  user.password = hashedPassword;
+});
 
 export default User;

@@ -19,21 +19,13 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
   return rooms;
 };
 
-/** Fetches the room with the given id along with the room history. */
+/** Fetches the room with the given id along with the family and their members. */
 export const fetchRoom = async (roomId: number): Promise<Room> => {
   const room = await Room.findByPk(roomId, {
     include: [
       {
         association: 'family',
         include: ['members'],
-      },
-      {
-        association: 'histories',
-        attributes: {
-          include: ['deletedAt'],
-        },
-        paranoid: false,
-        include: [{ association: 'family', paranoid: false }],
       },
     ],
   });
@@ -55,7 +47,7 @@ export const sendWelcomeEmailToFamily = async (family: Family) => {
   });
 };
 
-/** Creates new family along with the family members. */
+/** Adds new family with members in the room. */
 export const addFamily = async (
   parameters: AddFamilyParameters
 ): Promise<Family> => {
@@ -67,32 +59,32 @@ export const addFamily = async (
   if (room.status === 'OCCUPIED')
     throw new createError.BadRequest('Room already occupied.');
 
+  let family: Family;
   const transaction = await sequelizeInstance.transaction();
   try {
     const { name, sourceOfIncome, membersList } = familyAttributes;
 
-    const family = await Family.create(
+    family = await Family.create(
       {
         name,
         status: 'ACTIVE',
         sourceOfIncome,
-        members: membersList,
         roomId: room.id,
+        amount: room.price,
+        members: membersList,
       },
-      { include: ['members', 'histories'], transaction }
+      { include: ['members'], transaction }
     );
 
     await room.update({ status: 'OCCUPIED' }, { transaction });
-
     await transaction.commit();
-
-    sendWelcomeEmailToFamily(family);
-
-    return family;
   } catch (error) {
     await transaction.rollback();
     throw error;
   }
+
+  sendWelcomeEmailToFamily(family);
+  return family;
 };
 
 export default { createRoom, fetchAllRooms, fetchRoom, addFamily };

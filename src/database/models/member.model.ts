@@ -12,7 +12,7 @@ export interface MemberAttributes {
   mobile: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date;
+  deletedAt: Date | null;
 }
 
 export interface MemberCreationAttributes
@@ -24,7 +24,7 @@ export interface MemberCreationAttributes
 class Member
   extends Model<MemberAttributes, MemberCreationAttributes>
   implements MemberAttributes {
-  public id!: number;
+  public readonly id!: number;
 
   public familyId!: number;
 
@@ -36,11 +36,13 @@ class Member
 
   public mobile!: string;
 
-  public createdAt!: Date;
+  public readonly createdAt!: Date;
 
-  public updatedAt!: Date;
+  public readonly updatedAt!: Date;
 
-  public deletedAt!: Date;
+  public readonly deletedAt!: Date | null;
+
+  // Relations.
 
   public readonly family?: Family;
 }
@@ -52,34 +54,42 @@ Member.init(
       autoIncrement: true,
       primaryKey: true,
     },
+
     familyId: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     email: {
       type: DataTypes.STRING,
       allowNull: true,
     },
+
     birthDay: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     mobile: {
       type: DataTypes.STRING,
       allowNull: true,
     },
+
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,

@@ -6,6 +6,7 @@ import logger from '@helpers/logging/logging.helper';
 import transporter from '../index';
 
 const sendWelcomeEmail = (member: Member): void => {
+  if (process.env.NODE_ENV === 'test') return;
   if (member.email === null) return;
 
   const templateFile = fs.readFileSync(
@@ -13,7 +14,7 @@ const sendWelcomeEmail = (member: Member): void => {
     'utf8'
   );
 
-  const templateInHtml = handlebars.compile(templateFile);
+  const compiledHtml = handlebars.compile(templateFile);
 
   const message = {
     from: 'info@rentmag.com',
@@ -26,7 +27,7 @@ const sendWelcomeEmail = (member: Member): void => {
         cid: 'emailPng',
       },
     ],
-    html: templateInHtml({
+    html: compiledHtml({
       member: member.toJSON(),
     }),
   };

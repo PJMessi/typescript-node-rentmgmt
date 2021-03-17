@@ -1,5 +1,5 @@
 module.exports.up = async (queryInterface, DataTypes) => {
-  await queryInterface.createTable('roomFamilyHistories', {
+  await queryInterface.createTable('priceInformation', {
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -52,5 +52,5 @@ module.exports.up = async (queryInterface, DataTypes) => {
 };
 
 module.exports.down = async (queryInterface) => {
-  await queryInterface.dropTable('roomFamilyHistories');
+  await queryInterface.dropTable('priceInformation');
 };
