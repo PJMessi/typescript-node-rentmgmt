@@ -1,25 +1,35 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Optional } from 'sequelize';
 import sequelizeInstance from '../connection';
 
-class Invoice extends Model {
+export interface InvoiceAttributes {
+  id: number;
+  familyId: number;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface InvoiceCreationAttributes
+  extends Optional<
+    InvoiceAttributes,
+    'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
+  > {}
+
+class Invoice
+  extends Model<InvoiceAttributes, InvoiceCreationAttributes>
+  implements InvoiceAttributes {
   public readonly id!: number;
 
   public familyId!: number;
 
   public amount!: number;
 
-  public amountDetails!: {
-    roomId: number;
-    to: Date;
-    from: Date;
-    amount: number;
-  }[];
-
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
 
-  public readonly deletedAt!: Date;
+  public readonly deletedAt!: Date | null;
 }
 
 Invoice.init(
@@ -38,29 +48,6 @@ Invoice.init(
     amount: {
       type: DataTypes.DECIMAL(8, 2),
       allowNull: false,
-    },
-
-    amountDetails: {
-      type: DataTypes.TEXT,
-      set(
-        value: {
-          roomId: number;
-          to: Date;
-          from: Date;
-          amount: number;
-        }[]
-      ) {
-        const amountDetailsInJson = JSON.stringify(value);
-        this.setDataValue('amountDetails', amountDetailsInJson);
-      },
-      get(): {
-        roomId: number;
-        to: Date;
-        from: Date;
-        amount: number;
-      }[] {
-        return JSON.parse(this.getDataValue('amountDetails'));
-      },
     },
 
     createdAt: {
