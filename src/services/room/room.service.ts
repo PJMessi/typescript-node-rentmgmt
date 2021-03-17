@@ -78,12 +78,6 @@ export const addFamily = async (
         sourceOfIncome,
         members: membersList,
         roomId: room.id,
-        histories: [
-          {
-            roomId: room.id,
-            amount: room.price,
-          },
-        ],
       },
       { include: ['members', 'histories'], transaction }
     );

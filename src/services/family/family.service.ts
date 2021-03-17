@@ -1,4 +1,4 @@
-import { Family, Room, RoomFamilyHistory } from '@models/index';
+import { Family, Room } from '@models/index';
 import createError from 'http-errors';
 import sequelizeInstance from '../../database/connection';
 
@@ -24,21 +24,10 @@ export const changeRoom = async (
   try {
     const currentRoom = family.room!;
     await currentRoom.update({ status: 'EMPTY' }, { transaction });
-    await RoomFamilyHistory.destroy({
-      where: { roomId: currentRoom.id, familyId: family.id },
-      transaction,
-    });
 
     await newRoom.update({ status: 'OCCUPIED' }, { transaction });
     await family.update({ roomId: newRoom.id }, { transaction });
-    await RoomFamilyHistory.create(
-      {
-        roomId: newRoom.id,
-        familyId: family.id,
-        amount: newRoom.price,
-      },
-      { transaction }
-    );
+
     await transaction.commit();
   } catch (error) {
     await transaction.rollback();

@@ -9,8 +9,6 @@ import {
 import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
 import Family from './family.model';
-// eslint-disable-next-line import/no-cycle
-import RoomFamilyHistory from './roomfamilyhistory.model';
 
 export interface RoomAttributes {
   id: number;
@@ -49,8 +47,6 @@ class Room
   public deletedAt!: Date;
 
   public readonly family?: Family;
-
-  public readonly histories?: RoomFamilyHistory[];
 
   public getFamily!: HasOneGetAssociationMixin<Family>;
 
