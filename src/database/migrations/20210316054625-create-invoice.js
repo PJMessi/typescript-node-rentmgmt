@@ -23,6 +23,16 @@ module.exports.up = async (queryInterface, DataTypes) => {
       type: DataTypes.DECIMAL(8, 2),
     },
 
+    startDate: {
+      allowNull: true,
+      type: DataTypes.DATE,
+    },
+
+    endDate: {
+      allowNull: true,
+      type: DataTypes.DATE,
+    },
+
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

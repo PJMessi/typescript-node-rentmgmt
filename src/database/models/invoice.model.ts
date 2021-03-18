@@ -1,10 +1,18 @@
-import { Model, DataTypes, Optional } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  Optional,
+  HasOneGetAssociationMixin,
+} from 'sequelize';
 import sequelizeInstance from '../connection';
+import Family from './family.model';
 
 export interface InvoiceAttributes {
   id: number;
   familyId: number;
   amount: number;
+  startDate: Date;
+  endDate: Date;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -25,11 +33,19 @@ class Invoice
 
   public amount!: number;
 
+  public startDate!: Date;
+
+  public endDate!: Date;
+
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
 
   public readonly deletedAt!: Date | null;
+
+  // Relations.
+
+  public getFamily!: HasOneGetAssociationMixin<Family>;
 }
 
 Invoice.init(
@@ -47,6 +63,16 @@ Invoice.init(
 
     amount: {
       type: DataTypes.DECIMAL(8, 2),
+      allowNull: false,
+    },
+
+    startDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+
+    endDate: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
 
