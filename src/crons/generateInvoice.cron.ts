@@ -1,11 +1,19 @@
 import cron from 'node-cron';
-import {
-  generateInvoice,
-  sendInvoiceEmailToFamily,
-} from '@services/invoice/invoice.service';
+import { generateInvoice } from '@services/invoice/invoice.service';
 import { Family, Invoice } from '@root/database/models';
 import sequelizeInstance from '@root/database/connection';
 import logger from '@helpers/logging/logging.helper';
+import InvoiceEmail from '@root/email/invoiceEmail/invoiceEmail';
+
+/** Sends invoice email to all the members of the family of the invoice. */
+const sendInvoiceEmails = (invoices: Invoice[]) => {
+  invoices.forEach((invoice) => {
+    const invoiceEmail = new InvoiceEmail(invoice);
+    invoiceEmail.sendMail().catch((err) => {
+      logger.error(`CRON: Error while sending emails.\n${err.stack}`);
+    });
+  });
+};
 
 /** Generates invoice for the family every minute. */
 cron.schedule('* * * * *', async () => {
@@ -32,8 +40,9 @@ cron.schedule('* * * * *', async () => {
     }
     logger.info('CRON: Invoices generated successfully.');
 
-    invoices.forEach((invoice) => sendInvoiceEmailToFamily(invoice));
-    logger.info('CRON: Invoice emails sent successfully.');
+    sendInvoiceEmails(invoices);
+
+    logger.info('CRON: Invoice emails queued successfully.');
   } catch (error) {
     logger.error(`CRON: Failed to generate invoices.'\n${error}'`);
   }

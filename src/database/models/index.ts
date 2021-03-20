@@ -30,6 +30,19 @@ Family.belongsTo(Room, {
   as: 'room',
 });
 
+// Relation between Family and Invoice.
+Family.hasMany(Invoice, {
+  sourceKey: 'id',
+  foreignKey: 'familyId',
+  as: 'invoices',
+});
+
+Invoice.belongsTo(Family, {
+  targetKey: 'id',
+  foreignKey: 'familyId',
+  as: 'family',
+});
+
 export { User };
 export { Family };
 export { Member };

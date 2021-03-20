@@ -1,6 +1,17 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import axios from 'axios';
 
 const router = Router();
+
+const testFunction1 = () => {
+  axios('https://jsonplaceholder.typicode.com/todos/1')
+    .then((response) => {
+      console.log(response.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 const testFunction = async (
   req: Request,
@@ -8,7 +19,10 @@ const testFunction = async (
   next: NextFunction
 ): Promise<void | Response> => {
   try {
-    res.json({
+    console.log('before');
+    testFunction1();
+    console.log('after');
+    return res.json({
       success: true,
     });
   } catch (error) {

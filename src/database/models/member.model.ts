@@ -7,9 +7,9 @@ export interface MemberAttributes {
   id: number;
   familyId: number;
   name: string;
-  email: string;
+  email: string | null;
   birthDay: Date;
-  mobile: string;
+  mobile: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -30,11 +30,11 @@ class Member
 
   public name!: string;
 
-  public email!: string;
+  public email!: string | null;
 
   public birthDay!: Date;
 
-  public mobile!: string;
+  public mobile!: string | null;
 
   public readonly createdAt!: Date;
 

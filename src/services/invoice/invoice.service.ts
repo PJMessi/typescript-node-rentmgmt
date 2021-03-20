@@ -1,9 +1,8 @@
-import { Family, Invoice, Member } from '@models/index';
-import sendInvoiceEmail from '@root/helpers/email/invoiceEmail/invoiceEmail';
+import { Family, Invoice } from '@models/index';
 import moment from 'moment';
 import { Transaction } from 'sequelize/types';
 
-/** Generates invioce for the given family. */
+/** Generates invoice for the given family. */
 // eslint-disable-next-line import/prefer-default-export
 export const generateInvoice = async (
   family: Family,
@@ -41,20 +40,4 @@ export const generateInvoice = async (
   );
 
   return invoice;
-};
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/** Sends invoice email to all the members of the given family. */
-export const sendInvoiceEmailToFamily = async (invoice: Invoice) => {
-  await sleep(10000);
-  console.log('Here------------------------>');
-
-  const members = await Member.findAll({
-    where: { familyId: invoice.familyId },
-  });
-
-  members.forEach((member) => {
-    sendInvoiceEmail(member);
-  });
 };

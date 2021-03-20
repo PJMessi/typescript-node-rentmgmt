@@ -45,6 +45,8 @@ class Invoice
 
   // Relations.
 
+  public readonly family?: Family;
+
   public getFamily!: HasOneGetAssociationMixin<Family>;
 }
 

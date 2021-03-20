@@ -7,7 +7,7 @@ import express from 'express';
 import errorMiddleware from '@root/middlewares/error.middleware';
 import logger from '@root/helpers/logging/logging.helper';
 import path from 'path';
-import '@root/crons/generateInvoice';
+import '@root/crons/generateInvoice.cron';
 import routes from './routes/route';
 import '@root/customTypes';
 

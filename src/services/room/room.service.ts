@@ -1,7 +1,8 @@
 import { Family, Room } from '@models/index';
 import createError from 'http-errors';
-import sendWelcomeEmail from '@helpers/email/welcomeEmail/welcomeEmail';
+import WelcomeEmail from '@root/email/welcomeEmail/welcomeEmail';
 import sequelizeInstance from '@root/database/connection';
+import logger from '@helpers/logging/logging.helper';
 
 /** Creates new room from the given attributes. */
 export const createRoom = async (
@@ -43,7 +44,12 @@ export const sendWelcomeEmailToFamily = async (family: Family) => {
   }
 
   members.forEach((member) => {
-    sendWelcomeEmail(member);
+    const welcomeEmail = new WelcomeEmail(member);
+    if (member.email) {
+      welcomeEmail.sendMail().catch((err) => {
+        logger.error(`Error while sending welcome email.\n${err.stack}`);
+      });
+    }
   });
 };
 
