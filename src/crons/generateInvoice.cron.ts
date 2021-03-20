@@ -15,6 +15,29 @@ const sendInvoiceEmails = (invoices: Invoice[]) => {
   });
 };
 
+/** Generates the invoice for the given families. */
+const generateInvoices = async (families: Family[]): Promise<Invoice[]> => {
+  const invoices: Invoice[] = [];
+
+  const transaction = await sequelizeInstance.transaction();
+  try {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const family of families) {
+      // eslint-disable-next-line no-await-in-loop
+      const invoice = await generateInvoice(family, transaction);
+      logger.info(`CRON: Invoice generated for family: ${family.id}.`);
+      invoices.push(invoice);
+    }
+
+    await transaction.commit();
+
+    return invoices;
+  } catch (err) {
+    await transaction.rollback();
+    throw err;
+  }
+};
+
 /** Generates invoice for the family every minute. */
 cron.schedule('* * * * *', async () => {
   try {
@@ -22,22 +45,8 @@ cron.schedule('* * * * *', async () => {
 
     const families = await Family.findAll();
 
-    const invoices: Invoice[] = [];
-    const transaction = await sequelizeInstance.transaction();
-    try {
-      // eslint-disable-next-line no-restricted-syntax
-      for (const family of families) {
-        // eslint-disable-next-line no-await-in-loop
-        const invoice = await generateInvoice(family, transaction);
-        logger.info(`CRON: Invoice generated for family: ${family.id}.`);
-        invoices.push(invoice);
-      }
+    const invoices = await generateInvoices(families);
 
-      await transaction.commit();
-    } catch (err) {
-      await transaction.rollback();
-      throw err;
-    }
     logger.info('CRON: Invoices generated successfully.');
 
     sendInvoiceEmails(invoices);
