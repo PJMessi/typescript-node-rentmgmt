@@ -16,7 +16,8 @@ const sendInvoiceEmails = (invoices: Invoice[]) => {
   });
 };
 
-/** Checks if the invoice is already generated for the given family for the month. */
+/** Determines if the invoice should be generated for the family. If the invoice is already generated
+ * for the family in this month, it should not be generated. */
 const shouldGenerate = async (family: Family): Promise<boolean> => {
   let latestInvoices = family.invoices;
 
@@ -61,8 +62,8 @@ const generateInvoices = async (families: Family[]): Promise<Invoice[]> => {
   }
 };
 
-/** Generates invoice for the family every minute. */
-cron.schedule('* * * * *', async () => {
+/** Generates invoice for the family at 26th of every month. */
+cron.schedule('0 0 26 * *', async () => {
   try {
     logger.info('CRON: Generating invoices.');
 
