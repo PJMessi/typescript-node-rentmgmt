@@ -5,8 +5,10 @@ import {
   BelongsToGetAssociationMixin,
   HasManyGetAssociationsMixin,
 } from 'sequelize';
-import { Invoice } from '.';
+
 import sequelizeInstance from '../connection';
+// eslint-disable-next-line import/no-cycle
+import Invoice from './invoice.model';
 // eslint-disable-next-line import/no-cycle
 import Member, { MemberCreationAttributes } from './member.model';
 // eslint-disable-next-line import/no-cycle

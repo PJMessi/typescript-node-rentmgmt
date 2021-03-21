@@ -5,6 +5,7 @@ import {
   HasOneGetAssociationMixin,
 } from 'sequelize';
 import sequelizeInstance from '../connection';
+// eslint-disable-next-line import/no-cycle
 import Family from './family.model';
 
 export interface InvoiceAttributes {
