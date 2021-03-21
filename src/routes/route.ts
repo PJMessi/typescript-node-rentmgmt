@@ -3,19 +3,21 @@ import userRoutes from './authentication.route';
 import roomRoutes from './room.route';
 import familyRoutes from './family.route';
 import testRoutes from './test.route';
+import invoiceRoutes from './invoice.route';
 
-const route = Router();
+const router = Router();
 
-route.get('/', (req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
   return res.json({
     status: true,
     messsage: 'APIs are working fine.',
   });
 });
 
-route.use('/auth', userRoutes);
-route.use('/rooms', roomRoutes);
-route.use('/families', familyRoutes);
-route.use('/test', testRoutes);
+router.use('/auth', userRoutes);
+router.use('/rooms', roomRoutes);
+router.use('/families', familyRoutes);
+router.use('/invoices', invoiceRoutes);
+router.use('/test', testRoutes);
 
-export default route;
+export default router;
