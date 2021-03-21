@@ -61,7 +61,11 @@ describe('GET /families/:familyId', () => {
       const apiResult = await request
         .get(`/families/${family?.id}`)
         .set('Authorization', `Bearer ${token}`);
-      assert.equal(apiResult.status, 200);
+      assert.equal(
+        apiResult.status,
+        200,
+        'API should return 200 status code on success case.'
+      );
 
       /** checking the results------------------------------------------------------------------------ */
       const familyInApiResult = apiResult.body.data.family;

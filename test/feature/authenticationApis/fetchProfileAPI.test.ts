@@ -24,7 +24,11 @@ describe('GET /auth/profile', () => {
       const apiResult = await request
         .get('/auth/profile')
         .set('Authorization', `Bearer ${token}`);
-      assert.equal(apiResult.status, 200);
+      assert.equal(
+        apiResult.status,
+        200,
+        'API should return 200 status code on success case.'
+      );
 
       /** checking the results------------------------------------------------------------------------ */
       const userInApiResult = apiResult.body.data.user;

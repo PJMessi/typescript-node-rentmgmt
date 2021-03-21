@@ -20,11 +20,15 @@ describe('POST /auth/register', () => {
         passwordConfirmation: 'password',
       };
       const apiResult = await request.post('/auth/register').send(userData);
-      assert.equal(apiResult.status, 200);
+      assert.equal(
+        apiResult.status,
+        200,
+        'API should return 200 status code on success case.'
+      );
 
       /** checking the results------------------------------------------------------------------------ */
       const user = await User.findOne({ where: { email: userData.email } });
-      assert.isNotNull(user);
+      assert.isNotNull(user, 'User should be created.');
       assert.include(
         {
           email: user?.email,
@@ -57,7 +61,11 @@ describe('POST /auth/register', () => {
         passwordConfirmation: 'password',
       };
       const apiResult = await request.post('/auth/register').send(userData);
-      assert.equal(apiResult.status, 200);
+      assert.equal(
+        apiResult.status,
+        200,
+        'API should return 200 status code on success case.'
+      );
 
       /** checking the results------------------------------------------------------------------------ */
       const user = await User.findOne({ where: { email: userData.email } });

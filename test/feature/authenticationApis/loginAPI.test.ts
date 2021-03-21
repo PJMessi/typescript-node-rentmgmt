@@ -25,7 +25,11 @@ describe('POST /auth/login', () => {
         password: userData.password,
       };
       const apiResult = await request.post('/auth/login').send(credentials);
-      assert.equal(apiResult.status, 200);
+      assert.equal(
+        apiResult.status,
+        200,
+        'API should return 200 status code on success case.'
+      );
 
       /** checking the results------------------------------------------------------------------------ */
       const userInApiResult = apiResult.body.data.user;
