@@ -5,6 +5,7 @@ import {
   BelongsToGetAssociationMixin,
   HasManyGetAssociationsMixin,
 } from 'sequelize';
+import { Invoice } from '.';
 import sequelizeInstance from '../connection';
 // eslint-disable-next-line import/no-cycle
 import Member, { MemberCreationAttributes } from './member.model';
@@ -56,11 +57,15 @@ class Family
 
   public readonly members?: Member[];
 
+  public getMembers!: HasManyGetAssociationsMixin<Member>;
+
   public readonly room?: Room;
 
   public getRoom!: BelongsToGetAssociationMixin<Room>;
 
-  public getMembers!: HasManyGetAssociationsMixin<Member>;
+  public readonly invoices?: Invoice[];
+
+  public getInvoices!: HasManyGetAssociationsMixin<Invoice>;
 }
 
 Family.init(

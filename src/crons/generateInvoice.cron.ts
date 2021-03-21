@@ -4,6 +4,7 @@ import { Family, Invoice } from '@root/database/models';
 import sequelizeInstance from '@root/database/connection';
 import logger from '@helpers/logging/logging.helper';
 import InvoiceEmail from '@root/email/invoiceEmail/invoiceEmail';
+import moment from 'moment';
 
 /** Sends invoice email to all the members of the family of the invoice. */
 const sendInvoiceEmails = (invoices: Invoice[]) => {
@@ -15,6 +16,23 @@ const sendInvoiceEmails = (invoices: Invoice[]) => {
   });
 };
 
+/** Checks if the invoice is already generated for the given family for the month. */
+const shouldGenerate = async (family: Family): Promise<boolean> => {
+  let latestInvoices = family.invoices;
+
+  if (!latestInvoices)
+    // eslint-disable-next-line no-await-in-loop
+    latestInvoices = await family.getInvoices({
+      order: [['id', 'DESC']],
+      limit: 1,
+    });
+
+  return (
+    !latestInvoices[0] ||
+    latestInvoices[0].createdAt < moment().startOf('month').toDate()
+  );
+};
+
 /** Generates the invoice for the given families. */
 const generateInvoices = async (families: Family[]): Promise<Invoice[]> => {
   const invoices: Invoice[] = [];
@@ -24,9 +42,14 @@ const generateInvoices = async (families: Family[]): Promise<Invoice[]> => {
     // eslint-disable-next-line no-restricted-syntax
     for (const family of families) {
       // eslint-disable-next-line no-await-in-loop
-      const invoice = await generateInvoice(family, transaction);
-      logger.info(`CRON: Invoice generated for family: ${family.id}.`);
-      invoices.push(invoice);
+      const shouldGenerateInvoice = await shouldGenerate(family);
+
+      if (shouldGenerateInvoice) {
+        // eslint-disable-next-line no-await-in-loop
+        const invoice = await generateInvoice(family, transaction);
+        logger.info(`CRON: Invoice generated for family: ${family.id}.`);
+        invoices.push(invoice);
+      }
     }
 
     await transaction.commit();
@@ -43,7 +66,9 @@ cron.schedule('* * * * *', async () => {
   try {
     logger.info('CRON: Generating invoices.');
 
-    const families = await Family.findAll();
+    const families = await Family.findAll({
+      include: [{ association: 'invoices', order: [['id', 'DESC']], limit: 1 }],
+    });
 
     const invoices = await generateInvoices(families);
 
