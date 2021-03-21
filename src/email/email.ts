@@ -6,12 +6,13 @@ import Mail from 'nodemailer/lib/mailer';
 
 abstract class Email {
   transporter: Mail = nodemailer.createTransport({
-    host: 'smtp.mailtrap.io',
-    port: 2525,
+    host: process.env.MAIL_HOST || '',
+    port:
+      (process.env.MAIL_PORT && parseInt(process.env.MAIL_PORT, 10)) || 2525,
     secure: false,
     auth: {
-      user: 'af229ee2e7ee76',
-      pass: 'a5aa748fc18a3f',
+      user: process.env.MAIL_USERNAME || '',
+      pass: process.env.MAIL_PASSWORD || '',
     },
   });
 

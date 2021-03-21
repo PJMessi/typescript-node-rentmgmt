@@ -23,7 +23,7 @@ export const loginUser = async (credentials: {
   return { user, token };
 };
 
-/** Creates user with given data and generates auth token. */
+/** Creates new user and generates auth token. */
 export const createUser = async (userAttributes: {
   email: string;
   name: string;

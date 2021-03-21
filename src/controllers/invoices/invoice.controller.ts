@@ -12,7 +12,7 @@ export const fetchInvoices = async (
   next: NextFunction
 ): Promise<void | Response> => {
   try {
-    const invoices = await invoiceService.fetchInvoicesWithFamily();
+    const invoices = await invoiceService.fetchInvoices();
 
     return res.json({
       success: true,

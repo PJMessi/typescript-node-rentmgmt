@@ -8,11 +8,12 @@ import logger from '@helpers/logging/logging.helper';
 export const createRoom = async (
   roomAttributes: CreateRoomParameters
 ): Promise<Room> => {
-  const room = await Room.create({ ...roomAttributes, status: 'EMPTY' });
+  const defaultStatus: typeof Room.prototype.status = 'EMPTY';
+  const room = await Room.create({ ...roomAttributes, status: defaultStatus });
   return room;
 };
 
-/** Fetches all the rooms with the current family if any. */
+/** Fetches all the rooms along with the family (if any). */
 export const fetchAllRooms = async (): Promise<Room[]> => {
   const rooms = await Room.findAll({
     include: { association: 'family', required: false },
@@ -20,7 +21,7 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
   return rooms;
 };
 
-/** Fetches the room with the given id along with the family and their members. */
+/** Fetches the room along with the family and members information. */
 export const fetchRoom = async (roomId: number): Promise<Room> => {
   const room = await Room.findByPk(roomId, {
     include: [
@@ -53,7 +54,7 @@ export const sendWelcomeEmailToFamily = async (family: Family) => {
   });
 };
 
-/** Adds new family with members in the room. */
+/** Addes the new family with members in the room and sends welcome emails. */
 export const addFamily = async (
   parameters: AddFamilyParameters
 ): Promise<Family> => {

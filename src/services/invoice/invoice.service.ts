@@ -42,8 +42,8 @@ export const generateInvoice = async (
   return invoice;
 };
 
-/** Fetches the list of all the invoices with family members. */
-export const fetchInvoicesWithFamily = async (): Promise<Invoice[]> => {
+/** Fetches all the invoices along with family information. */
+export const fetchInvoices = async (): Promise<Invoice[]> => {
   const invoices = await Invoice.findAll({
     include: ['family'],
     order: [['id', 'DESC']],
@@ -52,4 +52,4 @@ export const fetchInvoicesWithFamily = async (): Promise<Invoice[]> => {
   return invoices;
 };
 
-export default { generateInvoice, fetchInvoicesWithFamily };
+export default { generateInvoice, fetchInvoices };
