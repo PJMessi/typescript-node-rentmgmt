@@ -5,9 +5,9 @@ import { assert } from 'chai';
 
 const request = supertest(app);
 
-describe('GET /rooms', () => {
+describe('GET /rooms/:roomId', () => {
   describe('Success case', () => {
-    it('should return 200 status code with list of rooms along with the family information.', async () => {
+    it('should return 200 status code with the room along with the family information.', async () => {
       /** creating test dependencies------------------------------------------------------------------ */
       // calling API to register new user.
       const userData = {
@@ -55,6 +55,7 @@ describe('GET /rooms', () => {
         .send(familyData)
         .set('Authorization', `Bearer ${token}`);
       const family = await room1?.getFamily({ include: ['members'] })!;
+      const members = family.members!;
 
       // calling API to create a room2.
       const roomData2 = {
@@ -69,20 +70,20 @@ describe('GET /rooms', () => {
       const room2 = await Room.findOne({ where: { name: roomData2.name } });
 
       /** calling the test api------------------------------------------------------------------------ */
-      const apiResult = await request
-        .get('/rooms')
+      const apiResult1 = await request
+        .get(`/rooms/${room1?.id}`)
         .set('Authorization', `Bearer ${token}`);
       assert.equal(
-        apiResult.status,
+        apiResult1.status,
         200,
         'API should return 200 status code on success case.'
       );
 
       /** checking the results------------------------------------------------------------------------ */
       await room1?.reload();
-      const roomsInApiResult = apiResult.body.data.rooms;
+      const roomInApiResult1 = apiResult1.body.data.room;
       assert.include(
-        roomsInApiResult[0],
+        roomInApiResult1,
         {
           id: room1?.id,
           name: room1?.name,
@@ -94,8 +95,9 @@ describe('GET /rooms', () => {
         'API should return correct room information.'
       );
 
+      const familyInApiResult1 = roomInApiResult1.family;
       assert.include(
-        roomsInApiResult[0].family,
+        familyInApiResult1,
         {
           id: family.id,
           name: family.name,
@@ -106,22 +108,48 @@ describe('GET /rooms', () => {
         'API should return correct family information.'
       );
 
-      await room2?.reload();
+      const membersInApiResult1 = familyInApiResult1.members;
       assert.include(
-        roomsInApiResult[1],
+        membersInApiResult1[0],
         {
-          id: room2?.id,
-          name: room2?.name,
-          description: room2?.description,
-          price: room2?.price,
-          createdAt: room2?.createdAt.toISOString(),
-          updatedAt: room2?.updatedAt.toISOString(),
+          id: members[0].id,
+          name: members[0].name,
+          email: members[0].email,
+          mobile: members[0].mobile,
+          birthDay: members[0].birthDay.toISOString(),
+          createdAt: members[0].createdAt.toISOString(),
+          updatedAt: members[0].updatedAt.toISOString(),
         },
-        'API should return correct room information.'
+        'API should return correct member information.'
+      );
+      assert.include(
+        membersInApiResult1[1],
+        {
+          id: members[1].id,
+          name: members[1].name,
+          email: members[1].email,
+          mobile: members[1].mobile,
+          birthDay: members[1].birthDay.toISOString(),
+          createdAt: members[1].createdAt.toISOString(),
+          updatedAt: members[1].updatedAt.toISOString(),
+        },
+        'API should return correct member information.'
       );
 
+      /** calling the test api------------------------------------------------------------------------ */
+      const apiResult2 = await request
+        .get(`/rooms/${room2?.id}`)
+        .set('Authorization', `Bearer ${token}`);
       assert.equal(
-        roomsInApiResult[1].family,
+        apiResult2.status,
+        200,
+        'API should return 200 status code on success case.'
+      );
+
+      /** checking the results------------------------------------------------------------------------ */
+      const familyInApiResult2 = apiResult2.body.data.room.family;
+      assert.equal(
+        familyInApiResult2,
         null,
         'API should return correct family information.'
       );
@@ -131,7 +159,7 @@ describe('GET /rooms', () => {
   describe('Error case', () => {
     it('should return 401 status code if bearer token is invalid.', async () => {
       /** calling the test api------------------------------------------------------------------------ */
-      const apiResult1 = await request.get('/rooms');
+      const apiResult1 = await request.get('/rooms/1');
       assert.equal(
         apiResult1.status,
         401,
@@ -140,7 +168,7 @@ describe('GET /rooms', () => {
 
       /** calling the test api------------------------------------------------------------------------ */
       const apiResult2 = await request
-        .get('/rooms')
+        .get('/rooms/1')
         .set('Authorization', 'Bearer invalidtoken');
       assert.equal(
         apiResult2.status,
