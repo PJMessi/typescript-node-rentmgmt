@@ -1,6 +1,7 @@
 import { Family, Invoice } from '@models/index';
 import moment from 'moment';
 import { Transaction } from 'sequelize/types';
+import createError from 'http-errors';
 
 /** Generates invoice for the given family. */
 // eslint-disable-next-line import/prefer-default-export
@@ -35,6 +36,7 @@ export const generateInvoice = async (
       amount: totalAmount,
       startDate,
       endDate: endOfTheMonth,
+      status: 'PENDING',
     },
     { transaction }
   );
@@ -52,4 +54,17 @@ export const fetchInvoices = async (): Promise<Invoice[]> => {
   return invoices;
 };
 
-export default { generateInvoice, fetchInvoices };
+/** Updates the payment status of the invoice. */
+export const updateInvoiceStatus = async (
+  invoiceId: number,
+  status: typeof Invoice.prototype.status
+): Promise<Invoice> => {
+  const invoice = await Invoice.findByPk(invoiceId);
+  if (invoice === null) throw new createError.NotFound('Invoice not found.');
+
+  await invoice.update({ status });
+
+  return invoice;
+};
+
+export default { generateInvoice, fetchInvoices, updateInvoiceStatus };

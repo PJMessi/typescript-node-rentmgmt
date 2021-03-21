@@ -14,6 +14,7 @@ export interface InvoiceAttributes {
   amount: number;
   startDate: Date;
   endDate: Date;
+  status: 'PENDING' | 'PAID';
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -37,6 +38,8 @@ class Invoice
   public startDate!: Date;
 
   public endDate!: Date;
+
+  public status!: 'PENDING' | 'PAID';
 
   public readonly createdAt!: Date;
 
@@ -76,6 +79,11 @@ Invoice.init(
 
     endDate: {
       type: DataTypes.DATE,
+      allowNull: false,
+    },
+
+    status: {
+      type: DataTypes.ENUM('PENDING', 'PAID'),
       allowNull: false,
     },
 

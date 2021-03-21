@@ -5,7 +5,6 @@ import invoiceService from '@services/invoice/invoice.service';
  * GET /invoices
  * Fetches the list of invoices along with the family information.
  */
-// eslint-disable-next-line import/prefer-default-export
 export const fetchInvoices = async (
   req: Request,
   res: Response,
@@ -17,6 +16,30 @@ export const fetchInvoices = async (
     return res.json({
       success: true,
       data: { invoices },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * PUT /invoices/:invoiceId/status
+ * Updates the status of the invoice.
+ */
+export const updateInvoiceStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const invoiceId = parseInt(req.params.invoiceId, 10);
+    const { status } = req.body;
+
+    const invoice = await invoiceService.updateInvoiceStatus(invoiceId, status);
+
+    return res.json({
+      success: true,
+      data: { invoice },
     });
   } catch (error) {
     return next(error);
