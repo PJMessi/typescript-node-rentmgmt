@@ -9,6 +9,7 @@ describe('POST /auth/login', () => {
   describe('Success case', () => {
     it('should return 200 status code with the user and valid auth token.', async () => {
       /** creating test dependencies------------------------------------------------------------------ */
+      // calling API to register new user.
       const userData = {
         email: 'testuser@rentmag.com',
         password: 'password',
@@ -16,6 +17,7 @@ describe('POST /auth/login', () => {
         passwordConfirmation: 'password',
       };
       await request.post('/auth/register').send(userData);
+      const user = await User.findOne({ where: { email: userData.email } });
 
       /** calling the test api------------------------------------------------------------------------ */
       const credentials = {
@@ -26,7 +28,6 @@ describe('POST /auth/login', () => {
       assert.equal(apiResult.status, 200);
 
       /** checking the results------------------------------------------------------------------------ */
-      const user = await User.findOne({ where: { email: userData.email } });
       const userInApiResult = apiResult.body.data.user;
       assert.include(
         userInApiResult,

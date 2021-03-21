@@ -9,20 +9,16 @@ describe('GET /auth/profile', () => {
   describe('Success case', () => {
     it('should return 200 status code with the user.', async () => {
       /** creating test dependencies------------------------------------------------------------------ */
+      // calling API to register new user.
       const userData = {
         email: 'testuser@rentmag.com',
         password: 'password',
         name: 'Test User',
         passwordConfirmation: 'password',
       };
-      await request.post('/auth/register').send(userData);
-
-      const credentials = {
-        email: userData.email,
-        password: userData.password,
-      };
-      const depApiResult = await request.post('/auth/login').send(credentials);
+      const depApiResult = await request.post('/auth/register').send(userData);
       const token = depApiResult.body.data.token!;
+      const user = await User.findOne({ where: { email: userData.email } });
 
       /** calling the test api------------------------------------------------------------------------ */
       const apiResult = await request
@@ -31,7 +27,6 @@ describe('GET /auth/profile', () => {
       assert.equal(apiResult.status, 200);
 
       /** checking the results------------------------------------------------------------------------ */
-      const user = await User.findOne({ where: { email: userData.email } });
       const userInApiResult = apiResult.body.data.user;
       assert.include(
         userInApiResult,
