@@ -62,8 +62,8 @@ const generateInvoices = async (families: Family[]): Promise<Invoice[]> => {
   }
 };
 
-/** Generates invoice for the family at 26th of every month. */
-cron.schedule('0 0 26 * *', async () => {
+/** Cron function that fetches the families and generates invoices and sends email. */
+const generateInvoiceCron = async () => {
   try {
     logger.info('CRON: Generating invoices.');
 
@@ -81,4 +81,9 @@ cron.schedule('0 0 26 * *', async () => {
   } catch (error) {
     logger.error(`CRON: Failed to generate invoices.'\n${error}'`);
   }
-});
+};
+
+/** Generates invoice for the family at 26th of every month. */
+cron.schedule('0 0 26 * *', generateInvoiceCron);
+
+export default generateInvoice;
