@@ -10,9 +10,11 @@ import path from 'path';
 import '@root/crons/generateInvoice.cron';
 import routes from './routes/route';
 import '@root/customTypes';
+import corsMiddleware from './middlewares/cors.middleware';
 
 const app = express();
 
+app.use(corsMiddleware);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(routes);
