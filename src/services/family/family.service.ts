@@ -11,4 +11,18 @@ export const fetchFamily = async (familyId: number): Promise<Family> => {
   return family;
 };
 
-export default { fetchFamily };
+/** Fetches the list of all families along with room information. */
+export const fetchFamilies = async (): Promise<Family[]> => {
+  const families = await Family.findAll({
+    include: [
+      {
+        association: 'room',
+        required: false,
+      },
+    ],
+  });
+
+  return families;
+};
+
+export default { fetchFamily, fetchFamilies };
