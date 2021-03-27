@@ -8,8 +8,8 @@
   "scripts": {
     "watch": "ts-node-dev --respawn src/app.ts",
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
-    "build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist",
-    "start": "npm run build; node dist/app.js",
+    "build": "tsc --project tsconfig-build.json && tscpaths -p tsconfig.json -s ./src -o ./dist",
+    "start": "node dist/app.js",
     "test": "SET NODE_ENV=test & mocha"
   },
   "dependencies": {
