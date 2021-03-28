@@ -1,9 +1,5 @@
 import { Router } from 'express';
-import {
-  registerUser,
-  loginuser,
-  fetchProfile,
-} from '@controllers/authentication/authentication.controller';
+import authcontroller from '@controllers/authentication/authentication.controller';
 import {
   validateForLoginUser,
   validateForRegisterUser,
@@ -12,8 +8,8 @@ import authMiddleware from '@middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/register', validateForRegisterUser, registerUser);
-router.post('/login', validateForLoginUser, loginuser);
-router.get('/profile', authMiddleware, fetchProfile);
+router.post('/register', validateForRegisterUser, authcontroller.registerUser);
+router.post('/login', validateForLoginUser, authcontroller.loginuser);
+router.get('/profile', authMiddleware, authcontroller.fetchProfile);
 
 export default router;
