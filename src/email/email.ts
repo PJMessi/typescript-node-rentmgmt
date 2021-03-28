@@ -36,6 +36,9 @@ abstract class Email {
     const mailOptions = await this.mailOptions();
 
     return new Promise((resolve, reject) => {
+      if (process.env.NODE_ENV === 'test')
+        resolve({ message: 'Email sending skipped.' });
+
       this.transporter
         .sendMail(mailOptions)
         .then((response) => {
