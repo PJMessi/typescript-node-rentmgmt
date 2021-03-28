@@ -7,12 +7,12 @@ const router = Router();
 
 router.post(
   '/register',
-  authApiValidatior.validateForRegisterUser,
+  authApiValidatior.registerUserValidate,
   authcontroller.registerUser
 );
 router.post(
   '/login',
-  authApiValidatior.validateForLoginUser,
+  authApiValidatior.loginuserValidate,
   authcontroller.loginuser
 );
 router.get('/profile', authMiddleware, authcontroller.fetchProfile);

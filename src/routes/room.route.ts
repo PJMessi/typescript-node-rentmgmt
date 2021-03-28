@@ -8,7 +8,7 @@ const router = Router();
 router.post(
   '/',
   authMiddleware,
-  roomApiValidator.validateForCreateRoom,
+  roomApiValidator.createRoomValidate,
   roomController.createRoom
 );
 router.get('/', authMiddleware, roomController.fetchAllRooms);
@@ -16,7 +16,7 @@ router.get('/:roomId', authMiddleware, roomController.fetchRoom);
 router.post(
   '/:roomId/families',
   authMiddleware,
-  roomApiValidator.validateForAddFamily,
+  roomApiValidator.addFamilyValidate,
   roomController.addFamily
 );
 

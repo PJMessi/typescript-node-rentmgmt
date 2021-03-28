@@ -9,7 +9,7 @@ router.get('/', authMiddleware, invoiceController.fetchInvoices);
 router.put(
   '/:invoiceId/status',
   authMiddleware,
-  invoiceApiValidator.validateForUpdateInvoiceStatus,
+  invoiceApiValidator.updateInvoiceStatusValidate,
   invoiceController.updateInvoiceStatus
 );
 
