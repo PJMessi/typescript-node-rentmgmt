@@ -1,5 +1,8 @@
 # Rent Management Application APIs
-Application that tracks the renting rooms, rentees, payments, etc for landlords/houseowners. **Node JS** is used for the backend and **MySQL** is used for storing data.
+Application that tracks the renting rooms, rentees, payments, etc for landlords/houseowners. **Node JS** is used for the backend and **MySQL** is used for storing data. **React** is used in the frontend.
+
+## Links
+[Frontend Respository](https://github.com/PJMessi/typescript-react-rentmgmt)
 
 ## About
 Helps house owners keeps track of rentees renting their rooms and the payments thats done or that needs to be done. Sends emails to the rentees to remind them about the rent 
