@@ -3,10 +3,10 @@ import bcrypt from 'bcrypt';
 import createError from 'http-errors';
 
 /** Checks if the user with given credentials exists. If yes, generates auth token. */
-export const loginUser = async (credentials: {
+export const fetchUserByCredentials = async (credentials: {
   email: string;
   password: string;
-}): Promise<{ user: User; token: string }> => {
+}): Promise<User> => {
   const user = await User.findOne({ where: { email: credentials.email } });
   if (!user) throw new createError.Unauthorized('Invalid credentials.');
 
@@ -18,9 +18,7 @@ export const loginUser = async (credentials: {
   if (!passwordMatches)
     throw new createError.Unauthorized('Invalid credentials.');
 
-  const token = user.generateToken();
-
-  return { user, token };
+  return user;
 };
 
 /** Creates new user and generates auth token. */
@@ -28,7 +26,7 @@ export const createUser = async (userAttributes: {
   email: string;
   name: string;
   password: string;
-}): Promise<{ user: User; token: string }> => {
+}): Promise<User> => {
   const doesUserExist = await User.findOne({
     where: { email: userAttributes.email },
   });
@@ -37,9 +35,7 @@ export const createUser = async (userAttributes: {
     throw new createError.BadRequest('User with the email already exist.');
 
   const user = await User.create(userAttributes);
-
-  const token = user.generateToken();
-  return { user, token };
+  return user;
 };
 
 /** Fetches the user with given id. */
@@ -48,4 +44,4 @@ export const fetchUserById = async (id: number): Promise<User | null> => {
   return user;
 };
 
-export default { loginUser, createUser, fetchUserById };
+export default { fetchUserByCredentials, createUser, fetchUserById };

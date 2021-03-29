@@ -8,6 +8,7 @@ export const fetchFamily = async (familyId: number): Promise<Family> => {
   });
 
   if (family === null) throw new createError.NotFound('Family not found.');
+
   return family;
 };
 

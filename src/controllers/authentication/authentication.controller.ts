@@ -18,7 +18,8 @@ export const registerUser = async (
       name: string;
     } = req.body;
 
-    const { user, token } = await userService.createUser(requestBody);
+    const user = await userService.createUser(requestBody);
+    const token = user.generateToken();
 
     return res.json({
       success: true,
@@ -44,7 +45,8 @@ export const loginuser = async (
       password: string;
     } = req.body;
 
-    const { user, token } = await userService.loginUser(requestBody);
+    const user = await userService.fetchUserByCredentials(requestBody);
+    const token = user.generateToken();
 
     return res.json({
       success: true,

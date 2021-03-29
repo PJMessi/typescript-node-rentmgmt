@@ -5,11 +5,15 @@ import sequelizeInstance from '@root/database/connection';
 import logger from '@helpers/logging/logging.helper';
 
 /** Creates new room from the given attributes. */
-export const createRoom = async (
-  roomAttributes: CreateRoomParameters
-): Promise<Room> => {
+export const createRoom = async (roomAttributes: {
+  name: string;
+  description?: string;
+  price: number;
+}): Promise<Room> => {
   const defaultStatus: typeof Room.prototype.status = 'EMPTY';
+
   const room = await Room.create({ ...roomAttributes, status: defaultStatus });
+
   return room;
 };
 
@@ -18,6 +22,7 @@ export const fetchAllRooms = async (): Promise<Room[]> => {
   const rooms = await Room.findAll({
     include: { association: 'family', required: false },
   });
+
   return rooms;
 };
 
@@ -33,6 +38,7 @@ export const fetchRoom = async (roomId: number): Promise<Room> => {
   });
 
   if (room === null) throw new createError.NotFound('Room not found.');
+
   return room;
 };
 
@@ -40,9 +46,7 @@ export const fetchRoom = async (roomId: number): Promise<Room> => {
 export const sendWelcomeEmailToFamily = async (family: Family) => {
   let { members } = family;
 
-  if (!members) {
-    members = await family.getMembers();
-  }
+  if (!members) members = await family.getMembers();
 
   members.forEach((member) => {
     const welcomeEmail = new WelcomeEmail(member);
@@ -54,7 +58,21 @@ export const sendWelcomeEmailToFamily = async (family: Family) => {
   });
 };
 
-/** Addes the new family with members in the room and sends welcome emails. */
+type AddFamilyParameters = {
+  familyId: number;
+  familyAttributes: {
+    name: string;
+    sourceOfIncome: string;
+    membersList: {
+      name: string;
+      email?: string;
+      mobile?: string;
+      birthDay: Date;
+    }[];
+  };
+};
+
+/** Adds the new family with members in the room and sends welcome emails. */
 export const addFamily = async (
   parameters: AddFamilyParameters
 ): Promise<Family> => {
@@ -84,6 +102,7 @@ export const addFamily = async (
     );
 
     await room.update({ status: 'OCCUPIED' }, { transaction });
+
     await transaction.commit();
   } catch (error) {
     await transaction.rollback();
@@ -95,23 +114,3 @@ export const addFamily = async (
 };
 
 export default { createRoom, fetchAllRooms, fetchRoom, addFamily };
-
-type CreateRoomParameters = {
-  name: string;
-  description?: string;
-  price: number;
-};
-
-type AddFamilyParameters = {
-  familyId: number;
-  familyAttributes: {
-    name: string;
-    sourceOfIncome: string;
-    membersList: {
-      name: string;
-      email?: string;
-      mobile?: string;
-      birthDay: Date;
-    }[];
-  };
-};
